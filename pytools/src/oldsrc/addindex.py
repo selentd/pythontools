@@ -1,5 +1,6 @@
 
 import datetime
+import os.path
 
 import pymongo
 from pymongo.mongo_client import MongoClient
@@ -37,15 +38,18 @@ def addIndex( source, dbName, indexName ):
             collection.insert(indexEntry)
        
 def addIndizes():
-    indexList = ['../data/dax.csv',
-                 '../data/estoxx50.csv',
-                 '../data/ftse100.csv',
-                 '../data/mdax.csv',
-                 '../data/nikkei225.csv',
-                 '../data/smi.csv',
-                 '../data/sp500.csv']
-
-    addIndex('../data/estoxx50.csv', 'indexdb', 'estoxx50')
+    indexList = ['dax',
+                 'estoxx50',
+                 'mdax',
+                 'nasdaq100',
+                 'nikkei',
+                 'smi',
+                 'sp500',
+                 'tecdax']
+    
+    for index in indexList:
+        print '../../data/'+index+'.csv'
+        addIndex('../../data/'+index+'.csv', 'stockdb', index)
     
     
 
