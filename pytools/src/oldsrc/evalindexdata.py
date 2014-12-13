@@ -5,8 +5,15 @@ class EvalIndexData:
     
 class EvalIndexDataBuy():
     def evaluateBuy(self, indexData):
-        return True    
+        return True
+    
+    def evaluateKnockOut(self, indexData):
+        return False    
 
 class EvalIndexDataSell(EvalIndexData):
     def evaluateSell(self, indexData):
         return False
+    
+    def evaluateKnockOut(self, indexData):
+        return False    
+    

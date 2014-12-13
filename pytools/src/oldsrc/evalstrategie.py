@@ -32,6 +32,12 @@ class EvalStrategie:
             checkSell = checkSell or strategie.evaluateSell(indexData)
         return checkSell
 
+    def evaluateKnockOut(self, indexData):
+        checkKnockOut = False
+        for strategie in self.sellStrategieList:
+            checkKnockOut = checkKnockOut or strategie.evaluateKnockOut(indexData)
+        return checkKnockOut
+    
     def evaluate(self, indexData, indexResultHistory ):
         for strategie in self.buyStrategieList:
             strategie.updateState(indexData, self.indexBuy)
@@ -46,10 +52,12 @@ class EvalStrategie:
                 self.state = 1
         else:
             checkSell = self.evaluateSell(indexData)
-            if checkSell == True:
+            checkKnockOut = self.evaluateKnockOut(indexData)
+            if checkSell == True or checkKnockOut == True:
                 indexResultHistory.addIndexResult( IndexResult( self.indexBuy, 
                                                                 indexData, 
-                                                                self.indexHistory) )
+                                                                self.indexHistory,
+                                                                checkKnockOut) )
                 self.state = 0
             else:
                 self.indexHistory.append(indexData)

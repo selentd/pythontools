@@ -4,10 +4,11 @@ import collections
 from indexdata import IndexData
 
 class IndexResult:
-    def __init__(self, indexBuy, indexSell, indexHistory ):
+    def __init__(self, indexBuy, indexSell, indexHistory, knockOut ):
         self.indexBuy = indexBuy
         self.indexSell = indexSell
         self.indexHistory = indexHistory
+        self.knockOut = knockOut
         
 class IndexResultHistory:
     def __init__(self):

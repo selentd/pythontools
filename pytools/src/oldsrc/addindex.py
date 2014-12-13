@@ -1,6 +1,5 @@
 
 import datetime
-import os.path
 
 import pymongo
 from pymongo.mongo_client import MongoClient

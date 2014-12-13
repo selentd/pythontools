@@ -20,14 +20,18 @@ from resultdata import IndexResultHistory
 from evalstrategie import EvalStrategie
 from evalresult import EvalResultCall, EvalResultPut
 
+import evalcallmw200
+
 def writeIndex( csvWrite, entry):
     dateString = entry['date'].strftime("%d.%m.%y")
     csvWrite.writerow( (dateString,
                         entry['close']) )
     
-def evalIndex( collection, strategie ):
+def evalIndex( collection, strategie, startDate ):
+
     resultHistory = IndexResultHistory()
-    for entry in collection.find().sort('date'):
+#    for entry in collection.find().sort('date'):    
+    for entry in collection.fine({'date': {'$gt': startDate}}).sort('date'):    
         indexEntry = IndexData()
         indexEntry.set(entry['date'], entry['open'], entry['close'], entry['high'], entry['low'])
         indexEntry.setMeanValues(entry['mean5'], entry['mean13'],entry['mean38'], entry['mean89'], entry['mean200'])
@@ -199,7 +203,7 @@ def calcIndizes():
                  '../data/result/smi.csv',
                  '../data/result/sp500.csv']
 
-    calcIndex('../data/result/dax_basic.csv', 'indexdb', 'dax')
+    calcIndex('../../data/result/dax_basic.csv', 'stockdb', 'dax')
     
     
     

@@ -2,7 +2,7 @@
 from resultdata import IndexResult
 
 class EvalResult:
-    def __init__(self, name):
+    def __init__(self, name, invest, knockOutLoss, leverage):
         self.name = name
         self.winCount = 0
         self.lossCount = 0
@@ -14,6 +14,9 @@ class EvalResult:
         self.maxLossEuro = 0.0
         self.sumWinEuro = 0.0
         self.sumLossEuro = 0.0
+        self.leverage = leverage
+        self.invest = invest
+        self.knockOutLoss = knockOutLoss
 
     def getTotalCount(self):
         return (self.winCount + self.lossCount)
@@ -39,20 +42,20 @@ class EvalResult:
     def getWinLoss(self, buy, sell):
         winLoss = sell / buy
         winLoss -= 1.0
-        return winLoss * 100.0
+        return winLoss
 
     def getWinLossEuroCall(self, buy, sell):
         result = self.getWinLoss(buy, sell)
-        result *= 10*20
-        if (result < -500):
-            result = -500
+        result *= self.invest * self.leverage
+        if (result < -self.knockOutLoss):
+            result = -self.knockOutLoss
         return result
 
     def getWinLossEuroPut(self, buy, sell):
         result = self.getWinLoss(buy, sell)
-        result *= 10*20
-        if (result < -500):
-            result = -500
+        result *= self.invest * self.leverage
+        if (result < -self.knockOutLoss):
+            result = -self.knockOutLoss
         return result
                 
     def evaluate(self, indexResult):
@@ -63,8 +66,8 @@ class EvalResult:
             self.evaluate( indexResult )
             
 class EvalResultCall( EvalResult ):
-    def __init__(self, name):
-        EvalResult.__init__(self, name)
+    def __init__(self, name, invest, knockOutLoss, leverage):
+        EvalResult.__init__(self, name, invest, knockOutLoss, leverage)
 
     def evaluate(self, indexResult):
         result = self.getWinLoss( indexResult.indexBuy.close, indexResult.indexSell.close )
@@ -88,8 +91,8 @@ class EvalResultCall( EvalResult ):
             
     
 class EvalResultPut( EvalResult ):
-    def __init__(self, name):
-        EvalResult.__init__(self, name)
+    def __init__(self, name, invest, knockOutLoss, leverage):
+        EvalResult.__init__(self, name, invest, knockOutLoss, leverage)
     
     def evaluate(self, indexResult):
         result = self.getWinLoss( indexResult.indexSell.close, indexResult.indexBuy.close)
