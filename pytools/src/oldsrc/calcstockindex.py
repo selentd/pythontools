@@ -138,7 +138,7 @@ def calcStockIndizes():
 #    startDate = datetime.datetime(2005, 1, 1)
 #    calcStockIndex('stockdb', 'dax', strategieList, startDate)
     for startDate in evalDates:
-        calcStockIndex( 'stockdb', 'nikkei', getStrategieList(), startDate)
+        calcStockIndex( 'stockdb', 'sp500', getStrategieList(), startDate)
     
 if __name__ == '__main__':
     calcStockIndizes()
