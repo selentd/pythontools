@@ -42,8 +42,9 @@ def calcStockIndex( dbName, indexName, strategieList, startDate):
     for resultHistory in resultList:
         resultData = EvalResultCall('result', 1000, 1000, 10)
         resultHistory.evaluateResult(resultData)
-        print str.format('{:35} {:>4} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>10.2f}', 
-                   resultData.name+' '+str(startDate),
+        print str.format('{:20} {:12} {:>4} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>10.2f}', 
+                   resultData.name+' '+indexName,
+                   str(startDate),
                    resultData.getTotalCount(),
                    resultData.getWinRatio(),
                    resultData.maxWin,
@@ -52,6 +53,8 @@ def calcStockIndex( dbName, indexName, strategieList, startDate):
                    resultData.getMeanLoss(),
                    resultData.sumWin+resultData.sumLoss,
                    resultData.sumWinEuro+resultData.sumLossEuro)
+        
+    
         
 def getEvalDatesMonth( year ):
     dateList = list()
@@ -132,13 +135,20 @@ def getStrategieList():
                                         [evalcallmw200.EvalCallMW200MeanBuy( 1.0 )], 
                                         [evalcallmw200.EvalCallMW200MeanSell( -3.0 )]))
     return strategieList
-            
-def calcStockIndizes():
+ 
+def calcStockIndizesDate():
     evalDates = getEvalDates()
 #    startDate = datetime.datetime(2005, 1, 1)
 #    calcStockIndex('stockdb', 'dax', strategieList, startDate)
     for startDate in evalDates:
         calcStockIndex( 'stockdb', 'sp500', getStrategieList(), startDate)
+    
+def calcStockIndizes():
+    indexList = ['dax', 'estoxx50', 'mdax', 'nasdaq100', 'nikkei', 'smi', 'sp500']
+
+    
+    for index in indexList:
+        calcStockIndex( 'stockdb', index, getStrategieList(), getFirstStartDate(index))
     
 if __name__ == '__main__':
     calcStockIndizes()

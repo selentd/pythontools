@@ -31,7 +31,7 @@ def evalIndex( collection, strategie, startDate ):
 
     resultHistory = IndexResultHistory()
 #    for entry in collection.find().sort('date'):    
-    for entry in collection.fine({'date': {'$gt': startDate}}).sort('date'):    
+    for entry in collection.find({'date': {'$gt': startDate}}).sort('date'):    
         indexEntry = IndexData()
         indexEntry.set(entry['date'], entry['open'], entry['close'], entry['high'], entry['low'])
         indexEntry.setMeanValues(entry['mean5'], entry['mean13'],entry['mean38'], entry['mean89'], entry['mean200'])

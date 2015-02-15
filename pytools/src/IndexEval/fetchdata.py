@@ -44,7 +44,7 @@ class FetchData():
     def fetchDataByDate(self, startDate, endDate):
         self.startDate = startDate
         self.endDate = endDate
-        return fetchData()
+        return self.fetchData()
 
 if __name__ == '__main__':
     start = datetime.datetime(1998, 01, 02, 0, 0);

@@ -5,7 +5,6 @@ Created on 15.02.2015
 '''
 
 import datetime
-import collections
 
 from IndexEval.fetchdata import FetchData
 from IndexEval.indexdata import IndexData 
@@ -18,20 +17,23 @@ def getNextMonth(startDate):
         return datetime.datetime(startDate.year+1, 1, startDate.day)
     
 def getIndexMonthlyData( dbName, index, startDate, endDate):
-    indexRangeList = collections.deque
+    indexRangeList = list()
     fetchData = FetchData(dbName, index)
     nextDate = getNextMonth(startDate)
     
     while startDate < endDate:
+        rangeData = IndexRangeData()
+        
         resultList = fetchData.fetchDataByDate(startDate, nextDate)
-        indexRangeList.append(IndexRangeData.setData(resultList))
+        rangeData.setData(resultList)
+        indexRangeList.append(rangeData)
         startDate=nextDate
         nextDate = getNextMonth(startDate)
         
     return indexRangeList
     
 def exportMonthlyData( dbName, indexList, startDate, endDate):
-    indexResultList = collections.deque
+    indexResultList = list()
     
     for index in indexList:
         indexResultList.append(getIndexMonthlyData(dbName, index, startDate, endDate))

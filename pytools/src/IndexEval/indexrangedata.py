@@ -10,7 +10,7 @@ class IndexRangeData(object):
     '''
 
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Constructor
         '''
@@ -31,9 +31,9 @@ class IndexRangeData(object):
                 self.minClose = entry.close
                 
             if entry.high > self.maxHigh:
-                self.maxHigh = self.high
+                self.maxHigh = entry.high
                 
             if entry.low < self.minLow:
-                self.minLow = self.low
+                self.minLow = entry.low
                 
  
