@@ -8,8 +8,6 @@ import collections
 import csv
 import datetime
 import string
-import indexdata
-
 
 class MeanSet:
     '''
@@ -167,6 +165,18 @@ class IndexHistory:
         for indexData in self.indexHistory:
             meanSet.setData(indexData.close)
             indexData.setMean(meanSet)
+
+    def len(self):
+        return len(self.indexHistory)
+
+    def getFirst(self):
+        return self.indexHistory[0]
+
+    def getLast(self):
+        return self.indexHistory[len(self.indexHistory)-1]
+
+    def getIndex(self, idx):
+        return self.indexHistory[idx]
 
 class IndexResult:
     '''

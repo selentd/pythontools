@@ -5,10 +5,7 @@ Created on 15.02.2015
 '''
 
 import datetime
-import csv
-import collections
 
-import pymongo
 from pymongo.mongo_client import MongoClient
 
 from indexdata import IndexData, IndexHistory
@@ -27,7 +24,7 @@ class FetchData():
         self.startDate = datetime.datetime(1900, 01, 01)
         self.endDate = datetime.datetime.today()
 
-    def fetchData(self):
+    def _fetchData(self):
         self.client = MongoClient()
         self.database = self.client[self.dbName]
         self.collection = self.database[self.indexName]
@@ -43,7 +40,15 @@ class FetchData():
     def fetchDataByDate(self, startDate, endDate):
         self.startDate = startDate
         self.endDate = endDate
-        return self.fetchData()
+        return self._fetchData()
+
+    def fetchDataByMonth(self, year, month):
+        self.startDate = datetime.datetime( year, month, 1)
+        if month == 12:
+            self.endDate = datetime.datetime( year + 1, 1, 1)
+        else:
+            self.endDate = datetime.datetime( year, month+1, 1)
+        return self._fetchData()
 
 if __name__ == '__main__':
     start = datetime.datetime(1998, 01, 02, 0, 0);
