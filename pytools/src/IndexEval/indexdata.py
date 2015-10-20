@@ -13,10 +13,10 @@ class MeanSet:
     '''
     MeanSet defines a set of mean values used for index analysis.
     Currently there are mean values defined for
-        5 days
-        13 days
-        38 days
-        89 days and
+          5 days
+         13 days
+         38 days
+         89 days and
         200 days
     '''
     class MeanData:
