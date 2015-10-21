@@ -41,7 +41,6 @@ class FetchDataTest(unittest.TestCase):
         self.assertEqual( resultList.getFirst().date.day, 4, "Invalid day (not january) for first value")
         self.assertEqual( resultList.getLast().date.day, 29, "Invalid day (not january) for last value")
 
-
     def testFetchDecember(self):
         resultList = FetchData(self.dbName, self.idxDax).fetchDataByMonth( 2010, 12 )
         self.assertNotEqual( resultList.len(), 0, "Result list is empty")
@@ -49,8 +48,8 @@ class FetchDataTest(unittest.TestCase):
         self.assertEqual( resultList.getLast().date.year, 2010, "Invalid year for last value")
         self.assertEqual( resultList.getFirst().date.month, 12, "Invalid month (not december) for first value")
         self.assertEqual( resultList.getLast().date.month, 12, "Invalid month (not december) for last value")
-        self.assertEqual( resultList.getFirst().date.day, 1, "Invalid day (not january) for first value")
-        self.assertEqual( resultList.getLast().date.day, 31, "Invalid day (not january) for last value")
+        self.assertEqual( resultList.getFirst().date.day, 1, "Invalid day (not december) for first value")
+        self.assertEqual( resultList.getLast().date.day, 31, "Invalid day (not december) for last value")
 
     def testFetchMarch(self):
         resultList = FetchData(self.dbName, self.idxDax).fetchDataByMonth( 2010, 3 )
@@ -61,6 +60,10 @@ class FetchDataTest(unittest.TestCase):
         self.assertEqual( resultList.getLast().date.month, 3, "Invalid month (not march) for last value")
         self.assertEqual( resultList.getFirst().date.day, 1, "Invalid day (not january) for first value")
         self.assertEqual( resultList.getLast().date.day, 31, "Invalid day (not january) for last value")
+
+    def testFetchEmptyMonth(self):
+        resultList = FetchData(self.dbName, self.idxDax).fetchDataByMonth( 1950, 11 )
+        self.assertEqual(resultList.len(), 0, "Result list is not empty")
 
 
 def suite():
