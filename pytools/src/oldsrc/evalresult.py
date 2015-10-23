@@ -6,6 +6,7 @@ class EvalResult:
         self.name = name
         self.winCount = 0
         self.lossCount = 0
+        self.knockOutCount = 0
         self.maxWin = 0.0
         self.maxLoss = 0.0
         self.sumWin = 0.0
@@ -20,7 +21,7 @@ class EvalResult:
 
     def getTotalCount(self):
         return (self.winCount + self.lossCount)
-    
+
     def getWinRatio(self):
         if (self.getTotalCount() > 0):
             return (float(self.winCount)/float(self.getTotalCount()))*100.0
@@ -32,7 +33,7 @@ class EvalResult:
             return (self.sumWin / float(self.winCount))
         else:
             return 0
-    
+
     def getMeanLoss(self):
         if (self.lossCount > 0):
             return (self.sumLoss / float(self.lossCount))
@@ -57,14 +58,14 @@ class EvalResult:
         if (result < -self.knockOutLoss):
             result = -self.knockOutLoss
         return result
-                
+
     def evaluate(self, indexResult):
         pass
-    
+
     def evaluateIndex(self, indexResultHistory):
         for indexResult in indexResultHistory:
             self.evaluate( indexResult )
-            
+
 class EvalResultCall( EvalResult ):
     def __init__(self, name, invest, knockOutLoss, leverage):
         EvalResult.__init__(self, name, invest, knockOutLoss, leverage)
@@ -77,23 +78,23 @@ class EvalResultCall( EvalResult ):
             self.sumWin += result
             if (self.maxWin < result):
                 self.maxWin = result
-                
+
             self.sumWinEuro += resultEuro
-                
+
         else:
             self.lossCount += 1
             self.sumLoss += result
             if (self.maxLoss > result):
                 self.maxLoss = result
-                
+
             self.sumLossEuro += resultEuro
-            
-            
-    
+
+
+
 class EvalResultPut( EvalResult ):
     def __init__(self, name, invest, knockOutLoss, leverage):
         EvalResult.__init__(self, name, invest, knockOutLoss, leverage)
-    
+
     def evaluate(self, indexResult):
         result = self.getWinLoss( indexResult.indexSell.close, indexResult.indexBuy.close)
         resultEuro = self.getWinLossEuroPut( indexResult.indexSell.close, indexResult.indexBuy.close)
@@ -102,9 +103,9 @@ class EvalResultPut( EvalResult ):
             self.sumWin += result
             if (self.maxWin < result):
                 self.maxWin = result
-                
+
             self.sumWinEuro += resultEuro
-                
+
         else:
             self.lossCount += 1
             self.sumLoss += result
@@ -112,6 +113,5 @@ class EvalResultPut( EvalResult ):
                 self.maxLoss = result
 
             self.sumLossEuro += resultEuro
-    
-    
-        
+
+

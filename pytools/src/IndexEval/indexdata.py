@@ -178,18 +178,32 @@ class IndexHistory:
     def getIndex(self, idx):
         return self.indexHistory[idx]
 
-class IndexResult:
+class TransactionResult:
     '''
     IndexResult defines the result of one transaction, together with the historical data
     entries between buy and sell.
     '''
-    def __init__(self, indexBuy, indexSell, indexHistory, knockOut ):
+    def __init__(self):
+        self.indexBuy = IndexData()
+        self.indexSell = IndexData()
+        self.indexHistory = IndexHistory()
+        self.knockOut = False
+
+    def setResult(self, indexBuy, indexSell, knockOut = False):
+        self.indexBuy = indexBuy
+        self.indexSell = indexSell
+        self.knockOut = knockOut
+
+    def setResultHistory(self, indexBuy, indexSell, indexHistory, knockOut = False ):
         self.indexBuy = indexBuy
         self.indexSell = indexSell
         self.indexHistory = indexHistory
         self.knockOut = knockOut
 
-class IndexResultHistory:
+    def isValid(self):
+        return (self.indexBuy.close) > 0 and (self.indexSell.close > 0)
+
+class TransactionResultHistory:
     '''
     IndexResultHistory defines the history of all transactions (index results) done for
     a period.
@@ -197,10 +211,10 @@ class IndexResultHistory:
     def __init__(self):
         self.resultHistory = collections.deque()
 
-    def addIndexResult(self, result):
+    def addTransactionResult(self, result):
         self.resultHistory.append(result)
 
-    def evaluateResult(self, result):
-        for indexResult in self.resultHistory:
-            result.evaluate( indexResult )
+    def evaluateResult(self, evaluationResult):
+        for transactionResult in self.resultHistory:
+            evaluationResult.evaluate( transactionResult )
 

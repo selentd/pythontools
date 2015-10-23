@@ -7,6 +7,7 @@ import unittest
 
 import test_fetchdata
 import test_indexdata
+import test_evalresult
 
 class Test(unittest.TestCase):
     pass
@@ -17,6 +18,7 @@ class PackageTestLoader(unittest.TestLoader):
         packageSuite = unittest.TestSuite()
         packageSuite.addTest(test_fetchdata.suite())
         packageSuite.addTest(test_indexdata.suite())
+        packageSuite.addTest(test_evalresult.suite())
         return packageSuite
 
 if __name__ == "__main__":

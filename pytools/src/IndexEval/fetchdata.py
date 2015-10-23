@@ -67,30 +67,34 @@ class FetchData():
     Get a list of monthly index histories
     '''
     def fetchMonthlyHistory(self, startDate, endDate, select=_selectTrue):
-        def _getNextMonth(self, year, month):
+        def _getNextMonth(year, month):
             if month == 12:
                 year = year + 1
                 month = 1
-                return( year, month )
+            else:
+                month += 1
 
-        def _getFirstMonth(self, startDate):
+            return( year, month )
+
+        def _getFirstMonth(startDate):
             return( startDate.year, startDate.month )
 
-        def _isEndOfPeriod(self, year, month, endDate):
-            isEndOfPeriod = (year >= endDate.year) and (month >= endDate.month)
-            return isEndOfPeriod
+        def _isEndOfPeriod(year, month, endDate):
+            checkIsEndOfPeriod = False
+            checkIsEndOfPeriod = (year >= endDate.year)
+            checkIsEndOfPeriod = checkIsEndOfPeriod and (month >= endDate.month)
+            return checkIsEndOfPeriod
 
         # --- start of function ---
 
         monthlyHistory = list()
         currentPeriod = _getFirstMonth( startDate )
 
-        while not _isEndOfPeriod(currentPeriod[0], currentPeriod[1]):
+        while not (_isEndOfPeriod(currentPeriod[0], currentPeriod[1], endDate)):
             indexHistory = self.fetchDataByMonth(currentPeriod[0], currentPeriod[1], select)
             if indexHistory.len() > 0:
                 monthlyHistory.append( indexHistory )
-
-            currentPeriod = _getNextMonth(currentPeriod[0], currentPeriod[1], endDate)
+            currentPeriod = _getNextMonth(currentPeriod[0], currentPeriod[1])
 
         return monthlyHistory
 
