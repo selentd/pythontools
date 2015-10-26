@@ -12,6 +12,11 @@ class ExcludeTransaction:
     def exclude(self, idxData):
         return False
 
+class ExcludeAvg200Low(ExcludeTransaction):
+
+    def exclude(self, idxData):
+        return (idxData.close < idxData.mean200)
+
 class ResultCalculator:
     '''
     Base class to calculate a transaction result
@@ -105,6 +110,15 @@ class EvalResult:
 
         self.sumLossEuro += resultEuro
 
+    def setExcludeChecker(self, checkExclude):
+        self.checkExclude = checkExclude
+
+    def setResultCalculator(self, calculator):
+        self.resultCalculator = calculator
+
+    def setResultCalculatorEuro(self, calculator):
+        self.resultCalculatorEuro = calculator
+
     def getTotalCount(self):
         return (self.winCount + self.lossCount)
 
@@ -152,10 +166,11 @@ class EvalResultCall( EvalResult ):
     def evaluate(self, transactionResult):
         result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
         resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
-        if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
-            self._updateWin(result, resultEuro)
-        else:
-            self._updateLoss(result, resultEuro)
+        if not (self.checkExclude.exclude(transactionResult.indexBuy)):
+            if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
+                self._updateWin(result, resultEuro)
+            else:
+                self._updateLoss(result, resultEuro)
 
 
 class EvalResultPut( EvalResult ):

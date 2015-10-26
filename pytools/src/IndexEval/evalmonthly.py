@@ -50,7 +50,7 @@ class EvalLastDay(EvalMonthly):
         for idxHistory in self.monthlyHistory:
             transaction = self._investOnLastDay(idxHistory)
             if transaction.isValid():
-                transactionList.addIndexResult(transaction)
+                transactionList.addTransactionResult(transaction)
 
         return transactionList
 
