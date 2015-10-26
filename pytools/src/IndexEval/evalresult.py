@@ -164,9 +164,9 @@ class EvalResultCall( EvalResult ):
         EvalResult.__init__(self, name, invest, fixInvest)
 
     def evaluate(self, transactionResult):
-        result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
-        resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
         if not (self.checkExclude.exclude(transactionResult.indexBuy)):
+            result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
+            resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
             if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
                 self._updateWin(result, resultEuro)
             else:
@@ -178,10 +178,11 @@ class EvalResultPut( EvalResult ):
         EvalResult.__init__(self, name, invest, fixInvest)
 
     def evaluate(self, transactionResult):
-        result = self.getWinLoss( transactionResult.indexSell.close, transactionResult.indexBuy.close)
-        resultEuro = self.getWinLossEuro( transactionResult.indexSell.close, transactionResult.indexBuy.close)
-        if (transactionResult.indexSell.close < transactionResult.indexBuy.close):
-            self._updateWin(result, resultEuro)
-        else:
-            self._updateLoss(result, resultEuro)
+        if not (self.checkExclude.exclude(transactionResult.indexBuy)):
+            result = self.getWinLoss( transactionResult.indexSell.close, transactionResult.indexBuy.close)
+            resultEuro = self.getWinLossEuro( transactionResult.indexSell.close, transactionResult.indexBuy.close)
+            if (transactionResult.indexSell.close < transactionResult.indexBuy.close):
+                self._updateWin(result, resultEuro)
+            else:
+                self._updateLoss(result, resultEuro)
 
