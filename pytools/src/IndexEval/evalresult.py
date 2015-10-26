@@ -62,8 +62,30 @@ class ResultCalculatorEuro(ResultCalculator):
     def reset(self):
         self.total = self.invest
 
-    def getTotal(self):
-        return self.total
+class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
+    def __init__(self, distance, invest, fixInvest = True):
+        ResultCalculatorEuro.__init__(self, invest, fixInvest)
+        self.distance = distance
+        self.k = 1.1302864364
+        self.d = 0.2029128054
+
+    def calcResult(self, buy, sell):
+        result = ResultCalculator().calcResult(buy, sell)
+
+        startCalc = (k * (self.distance)) + d
+        actCalc = (k * ((self.distance) + (result*100.0))) + d
+        percCalc = (actCalc / startCalc)-1
+
+        if self.fixInvest:
+            result = self.invest * percCalc
+        else:
+            result = self.total * percCalc
+
+        self.total += result
+        if self.total < 0:
+            self.total = 0
+
+        return result
 
 class EvalResult:
     '''
