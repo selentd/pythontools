@@ -72,8 +72,8 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
     def calcResult(self, buy, sell):
         result = ResultCalculator().calcResult(buy, sell)
 
-        startCalc = (k * (self.distance)) + d
-        actCalc = (k * ((self.distance) + (result*100.0))) + d
+        startCalc = (self.k * (self.distance)) + self.d
+        actCalc = (self.k * ((self.distance) + (result*100.0))) + self.d
         percCalc = (actCalc / startCalc)-1
 
         if self.fixInvest:

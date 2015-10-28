@@ -11,21 +11,27 @@ import evalresult
 
 class EvalLastDayTest(unittest.TestCase):
 
-
     def setUp(self):
         self.dbName = "stockdb"
         self.startDate = datetime.datetime( 2000, 1, 1 )
         self.endDate = datetime.datetime( 2014, 1, 1)
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
+        self.resultCalculator = evalresult.ResultCalculator()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(1000.0, self.fixedInvest)
 
     def tearDown(self):
         pass
 
 
     def _createResultEvalution(self, indexName):
+        self.resultCalculator.reset()
+        self.resultCalculatorEuro.reset()
+
         resultEvaluation = evalresult.EvalResultCall( indexName + " Monthly", 1000.0, self.fixedInvest )
         resultEvaluation.setExcludeChecker( self.excludeChecker )
+        resultEvaluation.setResultCalculator(self.resultCalculator )
+        resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)
         return resultEvaluation
 
     def _testIndexYear(self, index, year, resultEvaluation = None):
@@ -111,6 +117,7 @@ class EvalLastDayTest(unittest.TestCase):
     def testEvalLastDayFixed(self):
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, True )
 
         print "--- Calc Last day with fixed invest ---"
         self.calcLastDayDax()
@@ -125,6 +132,7 @@ class EvalLastDayTest(unittest.TestCase):
     def testEvalLastDayRolling(self):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeTransaction()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
 
         print "--- Calc Last day with rolling invest ---"
         self.calcLastDayDax()
@@ -139,6 +147,7 @@ class EvalLastDayTest(unittest.TestCase):
     def testEvalLastDayFixed_ExcludeAvg200(self):
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeAvg200Low()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, True )
 
         print "--- Calc Last day with fixed invest, exclude close < Avg200 ---"
         self.calcLastDayDax()
@@ -153,6 +162,7 @@ class EvalLastDayTest(unittest.TestCase):
     def testEvalLastDayRolling_ExcludeAvg200(self):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeAvg200Low()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
 
         print "--- Calc Last day with rolling invest, exclude close < Avg200 ---"
         self.calcLastDayDax()
