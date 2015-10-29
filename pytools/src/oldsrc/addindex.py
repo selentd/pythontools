@@ -37,7 +37,14 @@ def addIndex( source, dbName, indexName ):
             collection.insert(indexEntry)
 
 def addIndizes():
-    indexList = ['ibex']
+    indexList = ['dax',
+                 'estoxx50',
+                 'mdax',
+                 'nasdaq100',
+                 'nikkei',
+                 'smi',
+                 'sp500',
+                 'tecdax']
 
     for index in indexList:
         print '../../data/'+index+'.csv'

@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
     def setUp(self):
         self.dbName = "stockdb"
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2014, 1, 1)
+        self.endDate = datetime.datetime( 2015, 10, 1)
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculator = evalresult.ResultCalculator()
@@ -35,9 +35,6 @@ class Test(unittest.TestCase):
         return resultEvaluation
 
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
-        self.startDate = datetime.datetime( start, 1, 1 )
-        self.endDate = datetime.datetime( end, 1, 1)
-
         evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
 
         if not resultEvaluation:
@@ -177,9 +174,9 @@ class Test(unittest.TestCase):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeAvg200Low()
         #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 4, 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
 
-        print "--- Calc first days with rolling invest, leverage 15, exclude close < (Avg200-3%) ---"
+        print "--- Calc first days with rolling invest, leverage 6, exclude close < (Avg200) ---"
         self.calcIndices()
 
 '''
