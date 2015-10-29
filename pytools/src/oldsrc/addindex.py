@@ -16,7 +16,7 @@ def getIndexDateEntry( indexData ):
                                        0,
                                        0)
             }
-    
+
 def getIndexHistory( source, size = 1000000 ):
     indexHistory = indexdata.IndexHistory(source, size)
     indexHistory.readIndex()
@@ -35,24 +35,17 @@ def addIndex( source, dbName, indexName ):
         indexDate = getIndexDateEntry(indexData)
         if collection.find_one(indexDate) == None:
             collection.insert(indexEntry)
-       
+
 def addIndizes():
-    indexList = ['dax',
-                 'estoxx50',
-                 'mdax',
-                 'nasdaq100',
-                 'nikkei',
-                 'smi',
-                 'sp500',
-                 'tecdax']
-    
+    indexList = ['ibex']
+
     for index in indexList:
         print '../../data/'+index+'.csv'
         addIndex('../../data/'+index+'.csv', 'stockdb', index)
-    
-    
+
+
 
 if __name__ == '__main__':
-    addIndizes() 
+    addIndizes()
 
 
