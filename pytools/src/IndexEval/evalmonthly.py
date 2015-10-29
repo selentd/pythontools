@@ -54,6 +54,34 @@ class EvalLastDay(EvalMonthly):
 
         return transactionList
 
+class EvalFirstDays(EvalMonthly):
+
+    def __init__(self, useDays, dbName, idxName):
+        EvalMonthly.__init__(self, dbName, idxName)
+        self.useDays = useDays
+
+    def _investOnFirstDays(self, lastHistory, idxHistory):
+        transaction = indexdata.TransactionResult()
+
+        if (lastHistory.len() > 0) and (idxHistory.len() > self.useDays):
+            idxBuy = lastHistory.getLast()
+            idxSell = idxHistory.getIndex(self.useDays - 1)
+            transaction.setResult(idxBuy, idxSell)
+
+        return transaction
+
+    def calculateResult(self):
+        transactionList = indexdata.TransactionResultHistory()
+        lastHistory = None
+        for idxHistory in self.monthlyHistory:
+            if lastHistory:
+                transaction = self._investOnFirstDays(lastHistory, idxHistory)
+                if transaction.isValid():
+                    transactionList.addTransactionResult(transaction)
+
+            lastHistory = idxHistory
+
+        return transactionList
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

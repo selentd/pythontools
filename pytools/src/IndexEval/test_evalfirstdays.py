@@ -1,15 +1,16 @@
 '''
-Created on 23.10.2015
+Created on 29.10.2015
 
 @author: selen00r
 '''
+
 import datetime
 import unittest
 
 import evalmonthly
 import evalresult
 
-class EvalLastDayTest(unittest.TestCase):
+class Test(unittest.TestCase):
 
     def setUp(self):
         self.dbName = "stockdb"
@@ -23,7 +24,6 @@ class EvalLastDayTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-
     def _createResultEvalution(self, indexName):
         self.resultCalculator.reset()
         self.resultCalculatorEuro.reset()
@@ -34,11 +34,11 @@ class EvalLastDayTest(unittest.TestCase):
         resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)
         return resultEvaluation
 
-    def _testIndexYear(self, index, year, resultEvaluation = None):
-        self.startDate = datetime.datetime( year, 1, 1 )
-        self.endDate = datetime.datetime( year+1, 1, 1)
+    def _testIndexYear(self, index, start, end, resultEvaluation = None):
+        self.startDate = datetime.datetime( start, 1, 1 )
+        self.endDate = datetime.datetime( end, 1, 1)
 
-        evaluation = evalmonthly.EvalLastDay(self.dbName, index)
+        evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
 
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
@@ -47,9 +47,8 @@ class EvalLastDayTest(unittest.TestCase):
         transactionList = evaluation.calculateResult()
         transactionList.evaluateResult( resultEvaluation )
 
-        print str.format( '{:10} {:>4} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>8.2f}',
+        print str.format( '{:10} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>8.2f}',
                           index,
-                          year,
                           resultEvaluation.getTotalCount(),
                           resultEvaluation.winCount,
                           resultEvaluation.lossCount,
@@ -61,107 +60,77 @@ class EvalLastDayTest(unittest.TestCase):
     def calcLastDayDax(self):
         indexName = "dax"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayMDax(self):
         indexName = "mdax"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayTecDax(self):
         indexName = "tecdax"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDaySP500(self):
         indexName = "sp500"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayNasdaq(self):
         indexName = "nasdaq100"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayEStoxx50(self):
         indexName = "estoxx50"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayNikkei(self):
         indexName = "nikkei"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDaySMI(self):
         indexName = "smi"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayATX(self):
         indexName = "atx"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayCAC(self):
         indexName = "cac"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayDowJones(self):
         indexName = "dowjones"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayFts100(self):
         indexName = "fts100"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayFtseMib(self):
         indexName = "ftsemib"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayHangseng(self):
         indexName = "hangseng"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcLastDayIbex(self):
         indexName = "ibex"
         resultEvaluation = self._createResultEvalution(indexName)
-        for year in range(2000, 2014):
-            #self._testIndexYear( indexName, year )
-            self._testIndexYear( indexName, year, resultEvaluation )
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
     def calcIndices(self):
         self.calcLastDayDax()
@@ -184,37 +153,78 @@ class EvalLastDayTest(unittest.TestCase):
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, True )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
 
-        print "--- Calc Last day with fixed invest ---"
+        print "--- Calc first days with fixed invest ---"
         self.calcIndices()
 
-    def testEvalLastDayRolling(self):
+    def _testEvalLastDayRolling(self):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 4, 1000.0, False )
 
-        print "--- Calc Last day with rolling invest ---"
+        print "--- Calc first days with rolling invest ---"
         self.calcIndices()
 
     def _testEvalLastDayFixed_ExcludeAvg200(self):
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeAvg200Low()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, True )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
 
-        print "--- Calc Last day with fixed invest, exclude close < Avg200 ---"
+        print "--- Calc first days with fixed invest, exclude close < Avg200 ---"
         self.calcIndices()
 
-    def _testEvalLastDayRolling_ExcludeAvg200(self):
+    def testEvalLastDayRolling_ExcludeAvg200(self):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeAvg200Low()
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 8, 1000.0, False )
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 4, 1000.0, False )
 
-        print "--- Calc Last day with rolling invest, exclude close < Avg200 ---"
+        print "--- Calc first days with rolling invest, leverage 15, exclude close < (Avg200-3%) ---"
         self.calcIndices()
+
+'''
+        self.excludeChecker = evalresult.ExcludeAvg200Low(-0.02)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200-2%) ---"
+        self.calcIndices()
+
+        self.excludeChecker = evalresult.ExcludeAvg200Low(-0.01)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200-1%) ---"
+        self.calcIndices()
+
+        self.excludeChecker = evalresult.ExcludeAvg200Low()
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.excludeChecker = evalresult.ExcludeAvg200Low(0.01)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200+1%) ---"
+        self.calcIndices()
+
+        self.excludeChecker = evalresult.ExcludeAvg200Low(0.02)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200+2%) ---"
+        self.calcIndices()
+
+        self.excludeChecker = evalresult.ExcludeAvg200Low(0.03)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+
+        print "--- Calc first days with rolling invest, exclude close < (Avg200+3%) ---"
+        self.calcIndices()
+'''
 
 
 if __name__ == "__main__":

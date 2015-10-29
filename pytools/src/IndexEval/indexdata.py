@@ -200,6 +200,17 @@ class TransactionResult:
         self.indexHistory = indexHistory
         self.knockOut = knockOut
 
+    def getLowValue(self):
+        lowValue = self.indexBuy.close
+        if self.indexBuy.low < lowValue:
+            lowValue = self.indexBuy
+
+        for idxData in self.indexHistory:
+            if idxData.low < lowValue:
+                lowValue = idxData.low
+
+        return lowValue
+
     def isValid(self):
         return (self.indexBuy.close) > 0 and (self.indexSell.close > 0)
 

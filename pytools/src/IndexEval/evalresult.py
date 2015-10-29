@@ -14,8 +14,12 @@ class ExcludeTransaction:
 
 class ExcludeAvg200Low(ExcludeTransaction):
 
+    def __init__(self, offset = 0.0):
+        self.offset = offset
+
     def exclude(self, idxData):
-        return (idxData.close < idxData.mean200)
+        checkValue = idxData.mean200 + (idxData.mean200 * self.offset)
+        return (idxData.close < checkValue)
 
 class ResultCalculator:
     '''
@@ -79,11 +83,14 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         if self.fixInvest:
             result = self.invest * percCalc
         else:
-            result = self.total * percCalc
+            if self.total > 10000.0:
+                result = 10000.0 * percCalc
+            else:
+                result = self.total * percCalc
 
         self.total += result
         if self.total < 0:
-            self.total = 0
+            self.total = 1000.0
 
         return result
 
