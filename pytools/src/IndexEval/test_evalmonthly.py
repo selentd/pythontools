@@ -9,6 +9,15 @@ import unittest
 import evalmonthly
 import evalresult
 
+def printLastDayTransaction( transactionResult, result, resultEuro ):
+    print str.format( '{:10} {:>6.2f} {:>6.2f} {:>6.2f} {:>2.4f} {:>8.2f}',
+                      transactionResult.indexSell.date.isoformat(),
+                      transactionResult.indexBuy.close,
+                      transactionResult.indexSell.close,
+                      transactionResult.getLowValue(),
+                      result,
+                      resultEuro )
+
 class EvalLastDayTest(unittest.TestCase):
 
     def setUp(self):
@@ -45,8 +54,9 @@ class EvalLastDayTest(unittest.TestCase):
 
         evaluation.loadIndexHistory(self.startDate, self.endDate)
         transactionList = evaluation.calculateResult()
-        transactionList.evaluateResult( resultEvaluation )
+        transactionList.evaluateResult( resultEvaluation, printLastDayTransaction )
 
+        '''
         print str.format( '{:10} {:>4} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>8.2f}',
                           index,
                           year,
@@ -57,6 +67,7 @@ class EvalLastDayTest(unittest.TestCase):
                           resultEvaluation.maxLoss,
                           resultEvaluation.getTotalResult(),
                           resultEvaluation.getTotalResultEuro() )
+        '''
 
     def calcLastDayDax(self):
         indexName = "dax"
@@ -193,10 +204,26 @@ class EvalLastDayTest(unittest.TestCase):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 8, 1000.0, False )
 
-        print "--- Calc Last day with rolling invest, leverage 6 ---"
-        self.calcIndices()
+        print "--- Ibex Calc Last day with rolling invest, leverage  8 ---"
+        #self.calcIndices()
+        #self.calcLastDayDax()
+        #self.calcLastDayMDax()
+        #self.calcLastDayTecDax()
+        #self.calcLastDaySP500()
+        #self.calcLastDayNasdaq()
+        #self.calcLastDayEStoxx50()
+        #self.calcLastDayNikkei()
+        #self.calcLastDaySMI()
+        #self.calcLastDayATX()
+        #self.calcLastDayCAC()
+        #self.calcLastDayDowJones()
+        #self.calcLastDayFts100()
+        #self.calcLastDayFtseMib()
+        #self.calcLastDayHangseng()
+        self.calcLastDayIbex()
+
 
     def _testEvalLastDayFixed_ExcludeAvg200(self):
         self.fixedInvest = True
