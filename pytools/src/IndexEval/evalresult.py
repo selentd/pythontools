@@ -192,7 +192,7 @@ class EvalResultCall( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):
         EvalResult.__init__(self, name, invest, fixInvest)
 
-    def evaluate(self, transactionResult):
+    def evaluate(self, transactionResult, printTransaction = None):
         if not (self.checkExclude.exclude(transactionResult.indexBuy)):
             result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
             resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
@@ -201,12 +201,15 @@ class EvalResultCall( EvalResult ):
             else:
                 self._updateLoss(result, resultEuro)
 
+            if printTransaction:
+                printTransaction( transactionResult, result, resultEuro )
+
 
 class EvalResultPut( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):
         EvalResult.__init__(self, name, invest, fixInvest)
 
-    def evaluate(self, transactionResult):
+    def evaluate(self, transactionResult, printTransaction = None):
         if not (self.checkExclude.exclude(transactionResult.indexBuy)):
             result = self.getWinLoss( transactionResult.indexSell.close, transactionResult.indexBuy.close)
             resultEuro = self.getWinLossEuro( transactionResult.indexSell.close, transactionResult.indexBuy.close)
@@ -214,4 +217,7 @@ class EvalResultPut( EvalResult ):
                 self._updateWin(result, resultEuro)
             else:
                 self._updateLoss(result, resultEuro)
+
+            if printTransaction:
+                printTransaction( transactionResult, result, resultEuro )
 

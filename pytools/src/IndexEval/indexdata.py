@@ -202,12 +202,13 @@ class TransactionResult:
 
     def getLowValue(self):
         lowValue = self.indexBuy.close
-        if self.indexBuy.low < lowValue:
-            lowValue = self.indexBuy
+        if self.indexSell.low < lowValue:
+            lowValue = self.indexSell.low
 
-        for idxData in self.indexHistory:
-            if idxData.low < lowValue:
-                lowValue = idxData.low
+        if self.indexHistory.len() > 0:
+            for idxData in self.indexHistory:
+                if idxData.low < lowValue:
+                    lowValue = idxData.low
 
         return lowValue
 
@@ -225,7 +226,7 @@ class TransactionResultHistory:
     def addTransactionResult(self, result):
         self.resultHistory.append(result)
 
-    def evaluateResult(self, evaluationResult):
+    def evaluateResult(self, evaluationResult, printTransaction = None):
         for transactionResult in self.resultHistory:
-            evaluationResult.evaluate( transactionResult )
+            evaluationResult.evaluate( transactionResult, printTransaction )
 
