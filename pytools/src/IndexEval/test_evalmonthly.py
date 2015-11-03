@@ -193,9 +193,9 @@ class EvalLastDayTest(unittest.TestCase):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 4, 1000.0, False )
 
-        print "--- Calc Last day with rolling invest, leverage 6 ---"
+        print "--- Calc Last day with rolling invest, leverage 4 ---"
         self.calcIndices()
 
     def _testEvalLastDayFixed_ExcludeAvg200(self):
