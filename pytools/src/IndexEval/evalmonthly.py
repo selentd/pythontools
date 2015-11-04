@@ -67,6 +67,10 @@ class EvalFirstDays(EvalMonthly):
             idxBuy = lastHistory.getLast()
             idxSell = idxHistory.getIndex(self.useDays - 1)
             transaction.setResult(idxBuy, idxSell)
+            transaction.indexHistory.addIndexData(idxBuy)
+            for idx in range(0, self.useDays):
+                transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
+
 
         return transaction
 

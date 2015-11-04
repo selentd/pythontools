@@ -14,7 +14,7 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.dbName = "stockdb"
-        self.startDate = datetime.datetime( 2000, 1, 1 )
+        self.startDate = datetime.datetime( 1980, 1, 1 )
         self.endDate = datetime.datetime( 2015, 10, 1)
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
@@ -176,7 +176,7 @@ class Test(unittest.TestCase):
         #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
 
-        print "--- Calc first days with rolling invest, leverage 6, exclude close < (Avg200) ---"
+        print "--- Calc first 5 days with rolling invest, leverage 6, exclude close < (Avg200) ---"
         self.calcIndices()
 
 '''
