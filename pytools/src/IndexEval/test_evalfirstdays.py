@@ -10,11 +10,22 @@ import unittest
 import evalmonthly
 import evalresult
 
+def printLastDayTransaction( transactionResult, result, resultEuro ):
+    print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f} {: 8.2f}',
+                      transactionResult.indexSell.date,
+                      transactionResult.indexBuy.close,
+                      transactionResult.indexSell.close,
+                      transactionResult.getLowValue(),
+                      transactionResult.getHighValue(),
+                      transactionResult.lastDayResult,
+                      result,
+                      resultEuro )
+
 class Test(unittest.TestCase):
 
     def setUp(self):
         self.dbName = "stockdb"
-        self.startDate = datetime.datetime( 1980, 1, 1 )
+        self.startDate = datetime.datetime( 1999, 12, 1 )
         self.endDate = datetime.datetime( 2015, 10, 1)
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
@@ -43,8 +54,9 @@ class Test(unittest.TestCase):
         evaluation.loadIndexHistory(self.startDate, self.endDate)
         transactionList = evaluation.calculateResult()
         transactionList.evaluateResult( resultEvaluation )
+        #transactionList.evaluateResult( resultEvaluation, printLastDayTransaction )
 
-        print str.format( '{:10} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>8.2f}',
+        print str.format( '{:10} {:>4} {:>4} {:>4} {:>6.2f} {: 6.3f} {:>6.3f} {:>10.2f}',
                           index,
                           resultEvaluation.getTotalCount(),
                           resultEvaluation.winCount,
@@ -53,6 +65,7 @@ class Test(unittest.TestCase):
                           resultEvaluation.maxLoss,
                           resultEvaluation.getTotalResult(),
                           resultEvaluation.getTotalResultEuro() )
+
 
     def calcLastDayDax(self):
         indexName = "dax"
@@ -173,11 +186,39 @@ class Test(unittest.TestCase):
     def testEvalLastDayRolling_ExcludeAvg200(self):
         self.fixedInvest = False
         self.excludeChecker = evalresult.ExcludeAvg200Low()
-        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
+        #self.excludeChecker = evalmonthly.ExcludeAvg200LowAndLastDayPositive()
 
-        print "--- Calc first 5 days with rolling invest, leverage 6, exclude close < (Avg200) ---"
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 10, exclude close < (Avg200 & negative last days) ---"
         self.calcIndices()
+        #self.calcLastDayMDax()
+
+'''
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 40, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 40, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 30, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 30, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 25, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 25, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 20, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 15, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 15, exclude close < (Avg200) ---"
+        self.calcIndices()
+
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
+        print "--- Calc first 4 days with rolling invest, leverage 10, exclude close < (Avg200) ---"
+        self.calcIndices()
+'''
 
 '''
         self.excludeChecker = evalresult.ExcludeAvg200Low(-0.02)

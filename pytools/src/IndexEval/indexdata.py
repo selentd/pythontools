@@ -206,11 +206,23 @@ class TransactionResult:
             lowValue = self.indexSell.low
 
         if self.indexHistory.len() > 0:
-            for idxData in self.indexHistory:
+            for idxData in self.indexHistory.indexHistory:
                 if idxData.low < lowValue:
                     lowValue = idxData.low
 
         return lowValue
+
+    def getHighValue(self):
+        highValue = self.indexBuy.close
+        if self.indexSell.high > highValue:
+            highValue = self.indexSell.high
+
+        if self.indexHistory.len() > 0:
+            for idxData in self.indexHistory.indexHistory:
+                if idxData.high > highValue:
+                    highValue = idxData.high
+
+        return highValue
 
     def isValid(self):
         return (self.indexBuy.close) > 0 and (self.indexSell.close > 0)

@@ -28,12 +28,12 @@ class FetchData():
         self.endDate = datetime.datetime.today()
         self.selectFunc = _selectTrue
 
-    def _fetchData(self, select):
-        self.client = MongoClient()
-        self.database = self.client[self.dbName]
+        self.mongoClient = MongoClient()
+        self.database = self.mongoClient[self.dbName]
         self.collection = self.database[self.indexName]
-        self.selectFunc = select
+        self.selectFunc = _selectTrue
 
+    def _fetchData(self, select):
         history = IndexHistory()
 
         for entry in self.collection.find({'date': {'$gte': self.startDate, '$lt': self.endDate} }).sort('date'):

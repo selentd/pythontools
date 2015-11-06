@@ -17,9 +17,9 @@ class ExcludeAvg200Low(ExcludeTransaction):
     def __init__(self, offset = 0.0):
         self.offset = offset
 
-    def exclude(self, idxData):
-        checkValue = idxData.mean200 + (idxData.mean200 * self.offset)
-        return (idxData.close < checkValue)
+    def exclude(self, transactionResult):
+        checkValue = transactionResult.indexBuy.mean200 + (transactionResult.indexBuy.mean200 * self.offset)
+        return (transactionResult.indexBuy.close < checkValue)
 
 class ResultCalculator:
     '''
@@ -72,6 +72,7 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         self.distance = distance
         self.k = 1.1302864364
         self.d = 0.2029128054
+        self.maxInvest = 10000.0
 
     def calcResult(self, buy, sell):
         result = ResultCalculator().calcResult(buy, sell)
@@ -83,8 +84,8 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         if self.fixInvest:
             result = self.invest * percCalc
         else:
-            if self.total > 10000.0:
-                result = 10000.0 * percCalc
+            if self.total > self.maxInvest:
+                result = (self.total / 2) * percCalc
             else:
                 result = self.total * percCalc
 
@@ -193,7 +194,7 @@ class EvalResultCall( EvalResult ):
         EvalResult.__init__(self, name, invest, fixInvest)
 
     def evaluate(self, transactionResult, printTransaction = None):
-        if not (self.checkExclude.exclude(transactionResult.indexBuy)):
+        if not (self.checkExclude.exclude(transactionResult)):
             result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
             resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
             if (transactionResult.indexSell.close > transactionResult.indexBuy.close):

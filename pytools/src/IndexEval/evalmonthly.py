@@ -7,8 +7,11 @@ Created on 21.10.2015
 import datetime
 import unittest
 
+
+import evalresult
 import fetchdata
 import indexdata
+from cookielib import offset_from_tz_string
 
 class EvalMonthly:
     '''
@@ -54,6 +57,36 @@ class EvalLastDay(EvalMonthly):
 
         return transactionList
 
+class TransactionResultFirstDays(indexdata.TransactionResult):
+
+    def __init__(self):
+        indexdata.TransactionResult.__init__(self)
+
+        self.lastDayResult = 0.0
+
+class ExcludeAvg200LowAndLastDayNegative(evalresult.ExcludeAvg200Low):
+
+    def __init__(self, offset = 0.0):
+        evalresult.ExcludeAvg200Low.__init__(self, offset)
+
+    def exclude(self, transactionResult):
+        checkExclude = evalresult.ExcludeAvg200Low.exclude(self, transactionResult)
+        if not checkExclude:
+            checkExclude = (transactionResult.lastDayResult < 0)
+
+        return checkExclude
+
+class ExcludeAvg200LowAndLastDayPositive(evalresult.ExcludeAvg200Low):
+    def __init__(self, offset = 0.0):
+        evalresult.ExcludeAvg200Low.__init__(self, offset)
+
+    def exclude(self, transactionResult):
+        checkExclude = evalresult.ExcludeAvg200Low.exclude(self, transactionResult)
+        if not checkExclude:
+            checkExclude = (transactionResult.lastDayResult > 0)
+
+        return checkExclude
+
 class EvalFirstDays(EvalMonthly):
 
     def __init__(self, useDays, dbName, idxName):
@@ -61,13 +94,17 @@ class EvalFirstDays(EvalMonthly):
         self.useDays = useDays
 
     def _investOnFirstDays(self, lastHistory, idxHistory):
-        transaction = indexdata.TransactionResult()
+        transaction = TransactionResultFirstDays()
 
         if (lastHistory.len() > 0) and (idxHistory.len() > self.useDays):
             idxBuy = lastHistory.getLast()
             idxSell = idxHistory.getIndex(self.useDays - 1)
             transaction.setResult(idxBuy, idxSell)
             transaction.indexHistory.addIndexData(idxBuy)
+
+            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
+            transaction.lastDayResult -= 1.0
+
             for idx in range(0, self.useDays):
                 transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
 
