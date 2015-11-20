@@ -204,6 +204,9 @@ class EvalResultCall( EvalResult ):
 
             if printTransaction:
                 printTransaction( transactionResult, result, resultEuro )
+        else:
+            if printTransaction:
+                printTransaction( transactionResult, 0.0, 0.0, False)
 
 
 class EvalResultPut( EvalResult ):

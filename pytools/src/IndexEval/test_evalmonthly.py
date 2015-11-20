@@ -10,11 +10,13 @@ import evalmonthly
 import evalresult
 
 def printLastDayTransaction( transactionResult, result, resultEuro ):
-    print str.format( '{:10} {:>6.2f} {:>6.2f} {:>6.2f} {:>2.4f} {:>8.2f}',
-                      transactionResult.indexSell.date.isoformat(),
+    print str.format( '{:%Y-%m-%d} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {:>6.2f} {: 2.4f} {: 8.2f}',
+                      transactionResult.indexSell.date,
                       transactionResult.indexBuy.close,
                       transactionResult.indexSell.close,
                       transactionResult.getLowValue(),
+                      transactionResult.indexBuy.mean200,
+                      transactionResult.indexBuy.mean89,
                       result,
                       resultEuro )
 
@@ -221,7 +223,7 @@ class EvalLastDayTest(unittest.TestCase):
         #self.calcLastDayFts100()
         #self.calcLastDayFtseMib()
         #self.calcLastDayHangseng()
-        self.calcLastDayIbex()
+        self.calcLastDayTecDax()
 
     def _testEvalLastDayFixed_ExcludeAvg200(self):
         self.fixedInvest = True
