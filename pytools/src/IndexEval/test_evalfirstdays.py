@@ -12,6 +12,14 @@ import evalresult
 
 def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = True ):
     if hasResult:
+        '''
+        for entry in transactionResult.indexHistory.indexHistory:
+            print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} ',
+                              entry.date,
+                              entry.close,
+                              entry.low,
+                              entry.high )
+        '''
         print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f} {: 8.2f}',
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
@@ -49,8 +57,8 @@ class Test(unittest.TestCase):
         return resultEvaluation
 
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
-        evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
-
+        #evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
+        evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
 
@@ -188,14 +196,14 @@ class Test(unittest.TestCase):
 
     def testEvalLastDayRolling_ExcludeAvg200(self):
         self.fixedInvest = False
-        #self.excludeChecker = evalresult.ExcludeAvg200Low( 0.03 )
-        self.excludeChecker = evalmonthly.ExcludeAvg200LowAndLastDayPositive()
+        self.excludeChecker = evalresult.ExcludeAvg200Low()
+        #self.excludeChecker = evalmonthly.ExcludeAvg200LowAndLastDayPositive()
 
         #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
         print "--- Calc first 4 days with rolling invest, leverage 10, exclude close < (Avg200 + last day negative) ---"
         #self.calcIndices()
-        self.calcLastDayTecDax()
+        self.calcLastDaySP500()
 
 '''
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 40, 1000.0, False )

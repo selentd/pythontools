@@ -124,6 +124,63 @@ class EvalFirstDays(EvalMonthly):
 
         return transactionList
 
+class EvalFirstDaysStopLoss(EvalFirstDays):
+
+    def __init__(self, useDays, dbName, idxName):
+        EvalFirstDays.__init__(self, useDays, dbName, idxName)
+        self.stopLoss = -0.04
+        self.jumpDiff = 0.04
+
+    def _investOnFirstDaysWithStopLoss(self, lastHistory, idxHistory):
+        transaction = TransactionResultFirstDays()
+
+        if (lastHistory.len() > 0) and (idxHistory.len() > self.useDays):
+            idxBuy = lastHistory.getLast()
+            transaction.indexHistory.addIndexData(idxBuy)
+
+            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
+            transaction.lastDayResult -= 1.0
+
+            for idx in range(0, self.useDays):
+                transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
+                idxSell = idxHistory.getIndex(idx)
+                currentResult = (idxSell.close / idxBuy.close)-1.0
+                if currentResult < self.stopLoss:
+                    break
+
+                if idx == 0:
+                    startResult = currentResult
+                else:
+                    breakUp = False
+                    # --- check for jump result with low values!
+                    jumpResult = (idxSell.low / idxBuy.close)-1.0
+                    breakUp = ((startResult - jumpResult) > self.jumpDiff)
+                    # --- check for jump from last day result with low values!
+                    breakUp = breakUp or (transaction.lastDayResult - jumpResult) > self.jumpDiff
+                    if breakUp:
+                        break
+
+            transaction.setResult(idxBuy, idxSell)
+
+            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
+            transaction.lastDayResult -= 1.0
+
+        return transaction
+
+    def calculateResult(self):
+        transactionList = indexdata.TransactionResultHistory()
+        lastHistory = None
+        for idxHistory in self.monthlyHistory:
+            if lastHistory:
+                transaction = self._investOnFirstDaysWithStopLoss(lastHistory, idxHistory)
+                if transaction.isValid():
+                    transactionList.addTransactionResult(transaction)
+
+            lastHistory = idxHistory
+
+        return transactionList
+
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
