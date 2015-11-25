@@ -20,15 +20,15 @@ def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = 
                               entry.low,
                               entry.high )
         '''
-        print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f} {: 8.2f}',
+        print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
                           transactionResult.indexSell.close,
                           transactionResult.getLowValue(),
                           transactionResult.getHighValue(),
+                          transactionResult.indexBuy.mean200,
                           transactionResult.lastDayResult,
-                          result,
-                          resultEuro )
+                          result )
     else:
         print str.format( '{:%Y-%m-%d} {:6.2f}', transactionResult.indexSell.date, transactionResult.indexBuy.close )
 
@@ -57,8 +57,8 @@ class Test(unittest.TestCase):
         return resultEvaluation
 
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
-        #evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
-        evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
+        evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
+        #evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
 
@@ -203,7 +203,8 @@ class Test(unittest.TestCase):
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10, 1000.0, False )
         print "--- Calc first 4 days with rolling invest, leverage 10, exclude close < (Avg200 + last day negative) ---"
         #self.calcIndices()
-        self.calcLastDaySP500()
+        self.calcLastDayATX()
+
 
 '''
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 40, 1000.0, False )
