@@ -150,20 +150,19 @@ class EvalFirstDaysStopLoss(EvalFirstDays):
 
                 if idx == 0:
                     startResult = currentResult
-                else:
-                    breakUp = False
-                    # --- check for jump result with low values!
-                    jumpResult = (idxSell.low / idxBuy.close)-1.0
-                    breakUp = ((startResult - jumpResult) > self.jumpDiff)
-                    # --- check for jump from last day result with low values!
-                    breakUp = breakUp or (transaction.lastDayResult - jumpResult) > self.jumpDiff
-                    if breakUp:
-                        break
+
+                breakUp = False
+                # --- check for jump result with low values!
+                jumpResult = (idxSell.low / idxBuy.close)-1.0
+                breakUp = ((startResult - jumpResult) > self.jumpDiff)
+                # --- check for jump from last day result with low values!
+                breakUp = breakUp or (transaction.lastDayResult - jumpResult) > self.jumpDiff
+                # --- check for close below mean200
+                breakUp = breakUp or (idxSell.close < idxSell.mean200)
+                if breakUp:
+                    break
 
             transaction.setResult(idxBuy, idxSell)
-
-            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
-            transaction.lastDayResult -= 1.0
 
         return transaction
 

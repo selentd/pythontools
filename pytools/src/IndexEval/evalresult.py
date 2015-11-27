@@ -18,8 +18,11 @@ class ExcludeAvg200Low(ExcludeTransaction):
         self.offset = offset
 
     def exclude(self, transactionResult):
-        checkValue = transactionResult.indexBuy.mean200 + (transactionResult.indexBuy.mean200 * self.offset)
-        return (transactionResult.indexBuy.close < checkValue)
+        if transactionResult.indexBuy.mean200 > 0:
+            checkValue = transactionResult.indexBuy.mean200 + (transactionResult.indexBuy.mean200 * self.offset)
+            return (transactionResult.indexBuy.close < checkValue)
+        else:
+            return True
 
 class ResultCalculator:
     '''
