@@ -22,21 +22,21 @@ class EvalRunner(object):
         '''
         self.dbName = "indexdb"
 
-        self.idxDax         = "dax"
-        self.idxMDax        = "mdax"
-        self.idxTecDax      = "tecdax"
-        self.idxSP500       = "sp500"
-        self.idxNasdaq100   = "nasdaq100"
-        self.idxEStoxx50    = "estoxx50"
-        self.idxNikkei      = "nikkei"
-        self.idxSMI         = "smi"
         self.idxATX         = "atx"
         self.idxCAC         = "cac"
+        self.idxDax         = "dax"
         self.idxDowJones    = "dowjones"
-        self.idxFTS100      = "fts100"
+        self.idxEStoxx50    = "estoxx50"
+        self.idxFTS100      = "ftse100"
         self.idxFtseMib     = "ftsemib"
         self.idxHangSeng    = "hangseng"
         self.idxIbex        = "ibex"
+        self.idxMDax        = "mdax"
+        self.idxNasdaq100   = "nasdaq100"
+        self.idxNikkei      = "nikkei"
+        self.idxSMI         = "smi"
+        self.idxSP500       = "sp500"
+        self.idxTecDax      = "tecdax"
 
         self.allIndices = [self.idxATX, self.idxCAC, self.idxDax, self.idxDowJones, self.idxEStoxx50,
                            self.idxFTS100, self.idxFtseMib, self.idxHangSeng, self.idxIbex, self.idxMDax,
@@ -46,7 +46,7 @@ class EvalRunner(object):
         self.mongoClient = MongoClient()
         self.database = self.mongoClient[self.dbName]
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2015, 10, 1 )
+        self.endDate = datetime.datetime( 2015, 12, 1 )
 
         self.startInvest = 1000.0
         self.fixedInvest = True
@@ -57,3 +57,4 @@ class EvalRunner(object):
 
     def tearDown(self):
         pass
+
