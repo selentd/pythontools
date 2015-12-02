@@ -12,7 +12,7 @@ import evalresult
 
 def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = True ):
     if hasResult:
-
+        '''
         for entry in transactionResult.indexHistory.indexHistory:
             low = (entry.low / transactionResult.indexBuy.close)-1
             close = (entry.close / transactionResult.indexBuy.close)-1
@@ -37,7 +37,7 @@ def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = 
                           transactionResult.indexBuy.mean200,
                           transactionResult.lastDayResult,
                           result )
-        '''
+
     else:
         print str.format( '{:%Y-%m-%d} {:6.2f}', transactionResult.indexSell.date, transactionResult.indexBuy.close )
 
@@ -67,7 +67,8 @@ class Test(unittest.TestCase):
 
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
         #evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
-        evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
+        #evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
+        evaluation = evalmonthly.EvalMonthlyInvest(self.dbName, index)
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
 
@@ -162,6 +163,11 @@ class Test(unittest.TestCase):
         resultEvaluation = self._createResultEvalution(indexName)
         self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
+    def calcLastDaySDax(self):
+        indexName = "sdax"
+        resultEvaluation = self._createResultEvalution(indexName)
+        self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
+
     def calcIndices(self):
         self.calcLastDayDax()
         self.calcLastDayMDax()
@@ -209,10 +215,10 @@ class Test(unittest.TestCase):
         #self.excludeChecker = evalmonthly.ExcludeAvg200LowAndLastDayPositive()
 
         #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 6, 1000.0, False )
-        print "--- Calc first 4 days with rolling invest, leverage 6, exclude close < (Avg200) ---"
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 30, 1000.0, False )
+        print "--- Calc monthly with rolling invest, leverage 30, exclude close < (Avg200) ---"
         #self.calcIndices()
-        self.calcLastDayATX()
+        self.calcLastDayTecDax()
 
 
 '''

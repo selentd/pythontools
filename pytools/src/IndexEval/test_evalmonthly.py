@@ -25,7 +25,7 @@ class EvalLastDayTest(unittest.TestCase):
     def setUp(self):
         self.dbName = "stockdb"
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2015, 10, 1)
+        self.endDate = datetime.datetime( 2015, 12, 1)
         self.fixedInvest = True
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculator = evalresult.ResultCalculator()

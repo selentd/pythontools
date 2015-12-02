@@ -179,6 +179,42 @@ class EvalFirstDaysStopLoss(EvalFirstDays):
 
         return transactionList
 
+class EvalMonthlyInvest(EvalMonthly):
+
+    def __init__(self, dbName, idxName):
+        EvalMonthly.__init__(self, dbName, idxName)
+
+
+    def _investMonthly(self, lastHistory, idxHistory):
+        transaction = TransactionResultFirstDays()
+
+        if (lastHistory.len() > 0) and (idxHistory.len() > 0):
+            idxBuy = lastHistory.getLast()
+            idxSell = idxHistory.getLast()
+            transaction.setResult(idxBuy, idxSell)
+            transaction.indexHistory.addIndexData(idxBuy)
+
+            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
+            transaction.lastDayResult -= 1.0
+
+            for idx in range(0, idxHistory.len()):
+                transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
+
+        return transaction
+
+    def calculateResult(self):
+        transactionList = indexdata.TransactionResultHistory()
+        lastHistory = None
+        for idxHistory in self.monthlyHistory:
+            if lastHistory:
+                transaction = self._investMonthly(lastHistory, idxHistory)
+                if transaction.isValid():
+                    transactionList.addTransactionResult(transaction)
+
+            lastHistory = idxHistory
+
+        return transactionList
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
