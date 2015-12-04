@@ -12,6 +12,7 @@ import evalresult
 import fetchdata
 import indexdata
 from cookielib import offset_from_tz_string
+from sqlite3.test.transactions import TransactionTests
 
 class EvalMonthly:
     '''
@@ -214,6 +215,40 @@ class EvalMonthlyInvest(EvalMonthly):
             lastHistory = idxHistory
 
         return transactionList
+
+class EvalMonthlyInvestWithStopLoss(EvalMonthlyInvest):
+
+    def __init__(self, stopLoss, dbName, idxName):
+        EvalMonthlyInvest.__init__(self, dbName, idxName)
+
+        self.stopLoss = stopLoss
+        self.mean200Level = 0.97
+
+    def _investMonthly(self, lastHistory, idxHistory):
+        transaction = TransactionResultFirstDays()
+
+        if (lastHistory.len() > 0) and (idxHistory.len() > 0):
+            idxBuy = lastHistory.getLast()
+            transaction.indexHistory.addIndexData(idxBuy)
+
+            transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
+            transaction.lastDayResult -= 1.0
+
+            for idx in range(0, idxHistory.len()):
+                breakUp = False
+                transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
+                idxSell = idxHistory.getIndex(idx)
+                currentResult = (idxSell.close / idxBuy.close)-1.0
+                # --- check for stop loss
+                breakUp = (currentResult < self.stopLoss)
+                # --- check for value < mean200
+                breakUp = breakUp or (idxSell.close < (idxSell.mean200*self.mean200Level))
+                if breakUp:
+                    break
+
+        transaction.setResult(idxBuy, idxSell)
+
+        return transaction
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
         #evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
         #evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
-        evaluation = evalmonthly.EvalMonthlyInvest(self.dbName, index)
+        evaluation = evalmonthly.EvalMonthlyInvestWithStopLoss(-0.3, self.dbName, index)
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
 
@@ -211,12 +211,12 @@ class Test(unittest.TestCase):
 
     def testEvalLastDayRolling_ExcludeAvg200(self):
         self.fixedInvest = False
-        self.excludeChecker = evalresult.ExcludeAvg200Low()
+        self.excludeChecker = evalresult.ExcludeAvg200Low(0.03)
         #self.excludeChecker = evalmonthly.ExcludeAvg200LowAndLastDayPositive()
 
         #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro( 1000.0, False )
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 30, 1000.0, False )
-        print "--- Calc monthly with rolling invest, leverage 30, exclude close < (Avg200) ---"
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
+        print "--- Calc monthly with rolling invest, leverage 20, exclude close < (Avg200+3%) ---"
         #self.calcIndices()
         self.calcLastDayTecDax()
 
