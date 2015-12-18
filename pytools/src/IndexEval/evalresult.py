@@ -24,6 +24,14 @@ class ExcludeAvg200Low(ExcludeTransaction):
         else:
             return True
 
+class TransactionResultPrinter:
+    '''
+    Base class for printing of transactions
+    '''
+
+    def printResult(self, transactionResult, result, resultEuro ):
+        pass
+
 class ResultCalculator:
     '''
     Base class to calculate a transaction result
@@ -185,46 +193,41 @@ class EvalResult:
     def getWinLossEuro(self, buy, sell):
         return self.resultCalculatorEuro.calcResult(buy, sell)
 
-    def evaluate(self, indexResult):
+    def evaluateIndex(self, transactionResultHistory, resultPrinter = None ):
+        for transactionResult in transactionResultHistory:
+            self.evaluate( transactionResult, resultPrinter )
+
+    def _updateResult(self, transactionResult, result, resultEuro ):
         pass
 
-    def evaluateIndex(self, transactionResultHistory):
-        for transactionResult in transactionResultHistory:
-            self.evaluate( transactionResult )
+    def evaluate(self, transactionResult, resultPrinter = None):
+        result = 0.0
+        resultEuro = 0.0
+        if not (self.checkExclude.exclude(transactionResult)):
+            result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
+            resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
+            self._updateResult( transactionResult, result, resultEuro)
+
+        if resultPrinter:
+            resultPrinter.printResult( transactionResult, result, resultEuro )
 
 class EvalResultCall( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):
         EvalResult.__init__(self, name, invest, fixInvest)
 
-    def evaluate(self, transactionResult, printTransaction = None):
-        if not (self.checkExclude.exclude(transactionResult)):
-            result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
-            resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
-            if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
-                self._updateWin(result, resultEuro)
-            else:
-                self._updateLoss(result, resultEuro)
-
-            if printTransaction:
-                printTransaction( transactionResult, result, resultEuro )
+    def _updateResult(self, transactionResult, result, resultEuro):
+        if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
+            self._updateWin(result, resultEuro)
         else:
-            if printTransaction:
-                printTransaction( transactionResult, 0.0, 0.0, False)
-
+            self._updateLoss(result, resultEuro)
 
 class EvalResultPut( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):
         EvalResult.__init__(self, name, invest, fixInvest)
 
-    def evaluate(self, transactionResult, printTransaction = None):
-        if not (self.checkExclude.exclude(transactionResult.indexBuy)):
-            result = self.getWinLoss( transactionResult.indexSell.close, transactionResult.indexBuy.close)
-            resultEuro = self.getWinLossEuro( transactionResult.indexSell.close, transactionResult.indexBuy.close)
-            if (transactionResult.indexSell.close < transactionResult.indexBuy.close):
-                self._updateWin(result, resultEuro)
-            else:
-                self._updateLoss(result, resultEuro)
-
-            if printTransaction:
-                printTransaction( transactionResult, result, resultEuro )
+    def _updateResult(self, transactionResult, result, resultEuro):
+        if (transactionResult.indexSell.close < transactionResult.indexBuy.close):
+            self._updateWin(result, resultEuro)
+        else:
+            self._updateLoss(result, resultEuro)
 
