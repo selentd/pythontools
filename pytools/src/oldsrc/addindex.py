@@ -37,13 +37,21 @@ def addIndex( source, dbName, indexName ):
             collection.insert(indexEntry)
 
 def addIndizes():
-    addIndex('../../data/sdax.csv', 'stockdb', 'sdax')
-'''
-    indexList = ['dax',
+    #addIndex('../../data/sdax.csv', 'stockdb', 'sdax')
+
+    indexList = ['atx',
+                 'cac',
+                 'dax',
+                 'dowjones',
                  'estoxx50',
+                 'ftse100',
+                 'ftsemib',
+                 'hangseng',
+                 'ibex',
                  'mdax',
                  'nasdaq100',
                  'nikkei',
+                 'sdax',
                  'smi',
                  'sp500',
                  'tecdax']
@@ -52,7 +60,7 @@ def addIndizes():
         print '../../data/'+index+'.csv'
         addIndex('../../data/'+index+'.csv', 'stockdb', index)
 
-'''
+
 
 
 if __name__ == '__main__':

@@ -47,7 +47,7 @@ class EvalRunner(object):
 
     def setUp(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2015, 12, 1 )
+        self.endDate = datetime.datetime( 2016, 1, 1 )
 
         self.startInvest = 1000.0
         self.fixedInvest = True
