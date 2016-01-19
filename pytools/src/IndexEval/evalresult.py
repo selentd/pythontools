@@ -29,7 +29,7 @@ class TransactionResultPrinter:
     Base class for printing of transactions
     '''
 
-    def printResult(self, transactionResult, result, resultEuro ):
+    def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
         pass
 
 class ResultCalculator:
@@ -201,15 +201,17 @@ class EvalResult:
         pass
 
     def evaluate(self, transactionResult, resultPrinter = None):
+        hasResult = False
         result = 0.0
         resultEuro = 0.0
         if not (self.checkExclude.exclude(transactionResult)):
             result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
             resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
             self._updateResult( transactionResult, result, resultEuro)
+            hasResult = True
 
         if resultPrinter:
-            resultPrinter.printResult( transactionResult, result, resultEuro )
+            resultPrinter.printResult( transactionResult, result, resultEuro, hasResult )
 
 class EvalResultCall( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):

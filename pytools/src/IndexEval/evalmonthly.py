@@ -11,8 +11,6 @@ import unittest
 import evalresult
 import fetchdata
 import indexdata
-from cookielib import offset_from_tz_string
-from sqlite3.test.transactions import TransactionTests
 
 class EvalMonthly:
     '''
@@ -224,6 +222,14 @@ class EvalMonthlyInvestWithStopLoss(EvalMonthlyInvest):
         self.stopLoss = stopLoss
         self.mean200Level = 0.97
 
+    def _checkBreakUp(self, currentResult, idxSell):
+        breakUp = False
+        # --- check for stop loss
+        breakUp = (currentResult < self.stopLoss)
+        # --- check for value < mean200
+        breakUp = breakUp or (idxSell.close < (idxSell.mean200*self.mean200Level))
+        return breakUp
+
     def _investMonthly(self, lastHistory, idxHistory):
         transaction = TransactionResultFirstDays()
 
@@ -239,10 +245,7 @@ class EvalMonthlyInvestWithStopLoss(EvalMonthlyInvest):
                 transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
                 idxSell = idxHistory.getIndex(idx)
                 currentResult = (idxSell.close / idxBuy.close)-1.0
-                # --- check for stop loss
-                breakUp = (currentResult < self.stopLoss)
-                # --- check for value < mean200
-                breakUp = breakUp or (idxSell.close < (idxSell.mean200*self.mean200Level))
+                breakUp = self._checkBreakUp(currentResult, idxSell)
                 if breakUp:
                     break
 
@@ -250,6 +253,17 @@ class EvalMonthlyInvestWithStopLoss(EvalMonthlyInvest):
 
         return transaction
 
+class EvalMonthlyInvestWithStopLossAndMaxWin(EvalMonthlyInvestWithStopLoss):
+
+    def __init__(self, maxWin, stopLoss, dbName, idxName):
+        EvalMonthlyInvestWithStopLoss.__init__(self, stopLoss, dbName, idxName)
+
+        self.maxWin = maxWin
+
+    def _checkBreakUp(self, currentResult, idxSell):
+        breakUp = EvalMonthlyInvestWithStopLoss._checkBreakUp(self, currentResult, idxSell)
+        breakUp = breakUp or (currentResult > self.maxWin)
+        return breakUp
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

@@ -9,14 +9,17 @@ import unittest
 
 import evalmonthly
 import evalresult
+import transactionprinter
 
-def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = True ):
-    if hasResult:
-        '''
-        for entry in transactionResult.indexHistory.indexHistory:
-            low = (entry.low / transactionResult.indexBuy.close)-1
-            close = (entry.close / transactionResult.indexBuy.close)-1
-            print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+class PrintLastDayTransaction():
+
+    def printResult( self, transactionResult, result, resultEuro, hasResult = True ):
+        if hasResult:
+            '''
+            for entry in transactionResult.indexHistory.indexHistory:
+                low = (entry.low / transactionResult.indexBuy.close)-1
+                close = (entry.close / transactionResult.indexBuy.close)-1
+                print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                               entry.date,
                               entry.close,
                               entry.low,
@@ -27,8 +30,8 @@ def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = 
                               transactionResult.lastDayResult - low,
                               transactionResult.lastDayResult - close )
 
-        '''
-        print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f}',
+            '''
+            print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
                           transactionResult.indexSell.close,
@@ -38,8 +41,8 @@ def printLastDayTransaction( transactionResult, result, resultEuro, hasResult = 
                           transactionResult.lastDayResult,
                           result )
 
-    else:
-        print str.format( '{:%Y-%m-%d} {:6.2f}', transactionResult.indexSell.date, transactionResult.indexBuy.close )
+        else:
+            print str.format( '{:%Y-%m-%d} {:6.2f}', transactionResult.indexSell.date, transactionResult.indexBuy.close )
 
 class Test(unittest.TestCase):
 
@@ -68,14 +71,15 @@ class Test(unittest.TestCase):
     def _testIndexYear(self, index, start, end, resultEvaluation = None):
         #evaluation = evalmonthly.EvalFirstDays(4, self.dbName, index)
         #evaluation = evalmonthly.EvalFirstDaysStopLoss(4, self.dbName, index)
-        evaluation = evalmonthly.EvalMonthlyInvestWithStopLoss(-0.3, self.dbName, index)
+        #evaluation = evalmonthly.EvalMonthlyInvestWithStopLoss(-0.3, self.dbName, index)
+        evaluation = evalmonthly.EvalMonthlyInvestWithStopLossAndMaxWin(0.03, -0.08, self.dbName, index)
         if not resultEvaluation:
             resultEvaluation = self._createResultEvalution(index)
 
         evaluation.loadIndexHistory(self.startDate, self.endDate)
         transactionList = evaluation.calculateResult()
         #transactionList.evaluateResult( resultEvaluation )
-        transactionList.evaluateResult( resultEvaluation, printLastDayTransaction )
+        transactionList.evaluateResult( resultEvaluation, PrintLastDayTransaction() )
 
         print str.format( '{:10} {:>4} {:>4} {:>4} {:>6.2f} {: 6.3f} {:>6.3f} {:>10.2f}',
                           index,
@@ -143,8 +147,8 @@ class Test(unittest.TestCase):
         resultEvaluation = self._createResultEvalution(indexName)
         self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
-    def calcLastDayFts100(self):
-        indexName = "fts100"
+    def calcLastDayFtse100(self):
+        indexName = "ftse100"
         resultEvaluation = self._createResultEvalution(indexName)
         self._testIndexYear( indexName, 2000, 2014, resultEvaluation )
 
@@ -180,7 +184,7 @@ class Test(unittest.TestCase):
         self.calcLastDayATX()
         self.calcLastDayCAC()
         self.calcLastDayDowJones()
-        self.calcLastDayFts100()
+        self.calcLastDayFtse100()
         self.calcLastDayFtseMib()
         self.calcLastDayHangseng()
         self.calcLastDayIbex()
@@ -218,7 +222,7 @@ class Test(unittest.TestCase):
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20, 1000.0, False )
         print "--- Calc monthly with rolling invest, leverage 20, exclude close < (Avg200+3%) ---"
         #self.calcIndices()
-        self.calcLastDayMDax()
+        self.calcLastDayATX()
 
 
 '''
