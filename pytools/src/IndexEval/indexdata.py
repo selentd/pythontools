@@ -180,7 +180,7 @@ class IndexHistory:
 
 class TransactionResult:
     '''
-    IndexResult defines the result of one transaction, together with the historical data
+    TransactionResult defines the result of one transaction, together with the historical data
     entries between buy and sell.
     '''
     def __init__(self):

@@ -210,8 +210,8 @@ class EvalResult:
             self._updateResult( transactionResult, result, resultEuro)
             hasResult = True
 
-        if resultPrinter:
-            resultPrinter.printResult( transactionResult, result, resultEuro, hasResult )
+            if resultPrinter:
+                resultPrinter.printResult( transactionResult, result, resultEuro, hasResult )
 
 class EvalResultCall( EvalResult ):
     def __init__(self, name, invest, fixInvest = True):
