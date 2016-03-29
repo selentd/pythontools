@@ -54,15 +54,16 @@ class EvalRunner(object):
         self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculator = evalresult.ResultCalculator()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+        self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
 
     def tearDown(self):
         pass
 
-    def _createResultEvaluation(self, indexName):
+    def _createResultEvaluation(self, indexName, descriptionStr):
         self.resultCalculator.reset()
         self.resultCalculatorEuro.reset()
 
-        resultEvaluation = evalresult.EvalResultCall( indexName + " Monthly", self.startInvest, self.fixedInvest )
+        resultEvaluation = evalresult.EvalResultCall( indexName + " " + descriptionStr, self.startInvest, self.fixedInvest )
         resultEvaluation.setExcludeChecker( self.excludeChecker )
         resultEvaluation.setResultCalculator(self.resultCalculator )
         resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)
@@ -71,14 +72,13 @@ class EvalRunner(object):
     def _createIndexEvaluation(self):
         return None
 
-    def _evaluateIndex(self, indexName):
+    def evaluateIndex(self, indexName):
         resultEvaluation = self._createResultEvaluation(indexName)
-        evaluation = self.createIndexEvaluation()
+        evaluation = self._createIndexEvaluation()
 
         evaluation.loadIndexHistory(self.startDate, self.endDate)
         transactionList = evaluation.calculateResult()
-        transactionList.evaluateResult( resultEvaluation )
-        #transactionList.evaluateResult( resultEvaluation, printLastDayTransaction )
+        transactionList.evaluateResult( resultEvaluation, self.resultTransactionPrinter )
 
     def runEvaluation(self):
         pass
@@ -88,3 +88,6 @@ class EvalRunner(object):
         self.runEvaluation()
         self.tearDown()
 
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    EvalRunner.run()

@@ -9,7 +9,6 @@ import unittest
 
 import evalmonthly
 import evalresult
-import transactionprinter
 
 class PrintLastDayTransaction():
 
