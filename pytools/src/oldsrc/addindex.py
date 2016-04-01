@@ -17,7 +17,7 @@ def getIndexDateEntry( indexData ):
                                        0)
             }
 
-def getIndexHistory( source, size = 1000000 ):
+def getIndexHistory( source, size = 10000000 ):
     indexHistory = indexdata.IndexHistory(source, size)
     indexHistory.readIndex()
     return indexHistory

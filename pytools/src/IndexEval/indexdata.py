@@ -45,17 +45,33 @@ class MeanSet:
 
     def __init__(self):
         self.mean5 = self.MeanData(5)
+        self.mean8 = self.MeanData(8)
         self.mean13 = self.MeanData(13)
+        self.mean21 = self.MeanData(21)
+        self.mean34 = self.MeanData(34)
         self.mean38 = self.MeanData(38)
+        self.mean50 = self.MeanData(50)
+        self.mean55 = self.MeanData(55)
         self.mean89 = self.MeanData(89)
+        self.mean100 = self.MeanData(100)
+        self.mean144 = self.MeanData(144)
         self.mean200 = self.MeanData(200)
+        self.mean233 = self.MeanData(233)
 
     def setData(self, value):
         self.mean5.addValue( value )
+        self.mean8.addValue( value )
         self.mean13.addValue( value )
+        self.mean21.addValue( value )
+        self.mean34.addValue( value )
         self.mean38.addValue( value )
+        self.mean50.addValue( value )
+        self.mean55.addValue( value )
         self.mean89.addValue( value )
+        self.mean100.addValue( value )
+        self.mean144.addValue( value )
         self.mean200.addValue( value )
+        self.mean233.addValue( value )
 
 class IndexData:
     '''
@@ -69,10 +85,18 @@ class IndexData:
         self.high = 0
         self.low = 0
         self.mean5 = 0
+        self.mean8 = 0
         self.mean13 = 0
+        self.mean21 = 0
+        self.mean34 = 0
         self.mean38 = 0
+        self.mean50 = 0
+        self.mean55 = 0
         self.mean89 = 0
+        self.mean100 = 0
+        self.mean144 = 0
         self.mean200 = 0
+        self.mean233 = 0
 
     def _checkData(self):
         if self.low > self.high:
@@ -88,20 +112,81 @@ class IndexData:
         self.low = idxLow
         self._checkData()
 
+    def getMeanValue(self, mean):
+        if mean == 5:
+            return self.mean5
+        elif mean == 8:
+            return self.mean8
+        elif mean == 13:
+            return self.mean13
+        elif mean == 21:
+            return self.mean21
+        elif mean == 34:
+            return self.mean34
+        elif mean == 38:
+            return self.mean38
+        elif mean == 50:
+            return self.mean50
+        elif mean == 55:
+            return self.mean55
+        elif mean == 89:
+            return self.mean89
+        elif mean == 100:
+            return self.mean100
+        elif mean == 144:
+            return self.mean144
+        elif mean == 200:
+            return self.mean200
+        elif mean == 233:
+            return self.mean233
+        else:
+            return 0.0
 
-    def setMeanValues(self, mean5, mean13, mean38, mean89, mean200 ):
-        self.mean5 = mean5
-        self.mean13 = mean13
-        self.mean38 = mean38
-        self.mean89 = mean89
-        self.mean200 = mean200
+    def setMeanValue(self, mean, value):
+        if mean == 5:
+            self.mean5 = value
+        elif mean == 8:
+            self.mean8 = value
+        elif mean == 13:
+            self.mean13 = value
+        elif mean == 21:
+            self.mean21 = value
+        elif mean == 34:
+            self.mean34 = value
+        elif mean == 38:
+            self.mean38 = value
+        elif mean == 50:
+            self.mean50 = value
+        elif mean == 55:
+            self.mean55 = value
+        elif mean == 89:
+            self.mean89 = value
+        elif mean == 100:
+            self.mean100 = value
+        elif mean == 144:
+            self.mean144 = value
+        elif mean == 200:
+            self.mean200 = value
+        elif mean == 233:
+            self.mean233 = value
+        else:
+            pass
+
 
     def setMean(self, mean):
         self.mean5 = mean.mean5.getMeanValue()
+        self.mean8 = mean.mean8.getMeanValue()
         self.mean13 = mean.mean13.getMeanValue()
+        self.mean21 = mean.mean21.getMeanValue()
+        self.mean34 = mean.mean34.getMeanValue()
         self.mean38 = mean.mean38.getMeanValue()
+        self.mean50 = mean.mean50.getMeanValue()
+        self.mean55 = mean.mean55.getMeanValue()
         self.mean89 = mean.mean89.getMeanValue()
+        self.mean100 = mean.mean100.getMeanValue()
+        self.mean144 = mean.mean144.getMeanValue()
         self.mean200 = mean.mean200.getMeanValue()
+        self.mean233 = mean.mean233.getMeanValue()
 
     def getDictionary(self):
         return { "date": datetime.datetime(self.date.year,
@@ -112,10 +197,18 @@ class IndexData:
                  "low": self.low,
                  "close": self.close,
                  "mean5": self.mean5,
+                 "mean8": self.mean8,
                  "mean13": self.mean13,
+                 "mean21": self.mean21,
+                 "mean34": self.mean34,
                  "mean38": self.mean38,
+                 "mean50": self.mean50,
+                 "mean55": self.mean55,
                  "mean89": self.mean89,
-                 "mean200": self.mean200 }
+                 "mean100": self.mean100,
+                 "mean144": self.mean144,
+                 "mean200": self.mean200,
+                 "mean233": self.mean233 }
 
     def setDictionary(self, data):
         self.date = data["date"]
@@ -124,10 +217,18 @@ class IndexData:
         self.low = data["low"]
         self.close = data["close"]
         self.mean5 = data["mean5"]
+        self.mean8 = data["mean8"]
         self.mean13 = data["mean13"]
+        self.mean21 = data["mean21"]
+        self.mean34 = data["mean34"]
         self.mean38 = data["mean38"]
+        self.mean50 = data["mean50"]
+        self.mean55 = data["mean55"]
         self.mean89 = data["mean89"]
+        self.mean100 = data["mean100"]
+        self.mean144 = data["mean144"]
         self.mean200 = data["mean200"]
+        self.mean233 = data["mean233"]
         self._checkData()
 
 class IndexHistory:

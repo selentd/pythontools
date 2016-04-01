@@ -10,6 +10,26 @@ from pymongo.mongo_client import MongoClient
 
 import evalresult
 
+class EvalResultPrinter:
+
+    def printResult(self, indexName, descriptionStr, resultEvaluation):
+        pass
+
+class EvalResultPrinterSimple:
+
+    def printResult(self, indexName, descriptionStr, resultEvaluation):
+        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6.2f} {: 6.3f} {:>6.3f} {:>10.2f}',
+                          indexName,
+                          descriptionStr,
+                          resultEvaluation.getTotalCount(),
+                          resultEvaluation.winCount,
+                          resultEvaluation.lossCount,
+                          resultEvaluation.getWinRatio(),
+                          resultEvaluation.maxLoss,
+                          resultEvaluation.getTotalResult(),
+                          resultEvaluation.getTotalResultEuro() )
+
+
 class EvalRunner(object):
     '''
     Base class to run an evaluation of an index.
@@ -19,7 +39,7 @@ class EvalRunner(object):
         '''
         Constructor
         '''
-        self.dbName = "indexdb"
+        self.dbName = "stockdb"
 
         self.idxATX         = "atx"
         self.idxCAC         = "cac"
@@ -45,16 +65,31 @@ class EvalRunner(object):
         self.mongoClient = MongoClient()
         self.database = self.mongoClient[self.dbName]
 
-    def setUp(self):
+    def _setupStartEndTime(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
         self.endDate = datetime.datetime( 2016, 1, 1 )
 
+    def _setupResultCalculator(self):
         self.startInvest = 1000.0
         self.fixedInvest = True
-        self.excludeChecker = evalresult.ExcludeTransaction()
         self.resultCalculator = evalresult.ResultCalculator()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+
+    def _setupResultExcludeChecker(self):
+        self.excludeChecker = evalresult.ExcludeTransaction()
+
+    def _setupTransactionPrinter(self):
         self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
+
+    def _setupEvalResultPrinter(self):
+        self.evaluationResultPrinter = EvalResultPrinter()
+
+    def setUp(self):
+        self._setupStartEndTime()
+        self._setupResultCalculator()
+        self._setupResultExcludeChecker()
+        self._setupTransactionPrinter()
+        self._setupEvalResultPrinter()
 
     def tearDown(self):
         pass
@@ -69,23 +104,31 @@ class EvalRunner(object):
         resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)
         return resultEvaluation
 
-    def _createIndexEvaluation(self):
+    def _createIndexEvaluation(self, indexName):
         return None
 
-    def evaluateIndex(self, indexName):
-        resultEvaluation = self._createResultEvaluation(indexName)
-        evaluation = self._createIndexEvaluation()
+    def evaluateIndex(self, indexName, descriptionStr ):
+        resultEvaluation = self._createResultEvaluation(indexName, descriptionStr )
+        evaluation = self._createIndexEvaluation(indexName)
 
         evaluation.loadIndexHistory(self.startDate, self.endDate)
         transactionList = evaluation.calculateResult()
         transactionList.evaluateResult( resultEvaluation, self.resultTransactionPrinter )
 
-    def runEvaluation(self):
-        pass
+        self.evaluationResultPrinter.printResult(indexName, descriptionStr, resultEvaluation)
 
-    def run(self):
+    def runEvaluation(self, descriptionStr):
+        for indexName in self.allIndices:
+            self.evaluateIndex( indexName, descriptionStr )
+
+    def runIndex(self, indexName, descriptionStr = "" ):
         self.setUp()
-        self.runEvaluation()
+        self.evaluateIndex( indexName, descriptionStr )
+        self.tearDown()
+
+    def run(self, descriptionStr ):
+        self.setUp()
+        self.runEvaluation( descriptionStr )
         self.tearDown()
 
 if __name__ == "__main__":
