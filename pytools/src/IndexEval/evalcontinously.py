@@ -32,15 +32,19 @@ class StartTransactionCheckerStrategie(StartTransactionChecker):
                 startTransaction = startTransaction or checker.checkStartTransaction( idxData )
         return startTransaction
 
+    def addTransactionChecker(self, checker):
+        self.checkerList.append( checker )
+
 class StartTransactionCheckerMean(StartTransactionChecker):
 
-    def __init__(self, mean, isCall=True):
+    def __init__(self, mean, offset = 0.0, isCall=True):
         self.mean = mean
+        self.offset = offset
         self.isCall = isCall
 
     def checkStartTransaction(self, idxData):
         startTransaction = False
-        meanValue = idxData.getMeanValue( self.mean )
+        meanValue = idxData.getMeanValue( self.mean ) * (1.0 + self.offset)
         if meanValue != 0:
             if self.isCall:
                 startTransaction = (idxData.close > meanValue)
@@ -104,16 +108,20 @@ class EndTransactionCheckerStrategie(EndTransactionChecker):
 
         return endTransaction
 
+    def addTransactionChecker(self, checker):
+        self.checkerList.append( checker )
+
 class EndTransactionCheckerMean(EndTransactionChecker):
 
-    def __init__(self, mean, isCall=True):
+    def __init__(self, mean, offset = 0.0, isCall=True):
         EndTransactionChecker.__init__(self)
         self.mean = mean
+        self.offset = offset
         self.isCall = isCall
 
     def checkEndTransaction(self, idxData, idxHistoryLen):
         endTransaction = False
-        meanValue = idxData.getMeanValue( self.mean )
+        meanValue = idxData.getMeanValue( self.mean ) * (1.0 + self.offset)
         if meanValue != 0:
             if self.isCall:
                 endTransaction = (idxData.close < meanValue)
@@ -205,7 +213,7 @@ class EndTransactionCheckerMaxJump(EndTransactionChecker):
         endTransaction = False
 
         if self.maxJumpPerc > 0.0:
-            result = (float(idxData.close) / float(self.maxLow)) - 1.0
+            result = (float(idxData.close) / float(self.minLow)) - 1.0
             if result > self.maxJumpPerc:
                 endTransaction = True
 
@@ -243,11 +251,14 @@ class EvalContinously:
     classdocs
     '''
 
-    def __init__(self, dbName, idxName):
+    def __init__(self, dbName, idxName, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
         self.dbName = dbName
         self.idxName = idxName
-        self.hasPostEndTransactionChecker = False
-        self.postEndTransactionChecker = None
+        self.maxDays = maxDays
+        self.maxLoss = maxLoss
+        self.maxJump = maxJump
+        self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0)
+        self.postEndTransactionChecker = EndTransactionChecker()
 
     def loadIndexHistory(self, startDate, endDate = datetime.datetime.now()):
         self.startDate = startDate
@@ -258,6 +269,22 @@ class EvalContinously:
     def _setupTransactionCheckers(self):
         self.startTransactionChecker = StartTransactionChecker()
         self.endTransactionChecker = EndTransactionChecker()
+
+    def _setupPostTransactionCheckers(self):
+        if self.hasPostEndTransactionChecker:
+            checkerList = list()
+            if self.maxDays > 0:
+                checkerList.append( EndTransactionCheckerMaxDays(self.maxDays))
+
+            if self.maxLoss != 0:
+                checkerList.append( EndTransactionCheckerMaxLoss(self.maxLoss) )
+
+            if self.maxJump != 0:
+                checkerList.append( EndTransactionCheckerMaxJump( self.maxJump ))
+
+            self.postEndTransactionChecker = EndTransactionCheckerStrategie( checkerList )
+        else:
+            self.postEndTransactionChecker = EndTransactionChecker()
 
     def _checkStartTransaction(self, idxData):
         return self.startTransactionChecker.checkStartTransaction(idxData)
@@ -313,37 +340,48 @@ class EvalContinously:
 
 class EvalContinouslyMean(EvalContinously):
 
-    def __init__(self, dbName, idxName, mean, maxDays=0):
-        EvalContinously.__init__(self, dbName, idxName)
+    def __init__(self, dbName, idxName, mean, offset = 0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
+        EvalContinously.__init__(self, dbName, idxName, maxDays, maxLoss, maxJump)
         self.mean = mean
-        self.maxDays = maxDays
+        self.offset = offset
+
 
     def _setupTransactionCheckers(self):
-        self.startTransactionChecker = StartTransactionCheckerMean( self.mean )
+        self.startTransactionChecker = StartTransactionCheckerMean( self.mean, self.offset )
         self.endTransactionChecker = EndTransactionCheckerMean( self.mean )
-        if self.maxDays > 0:
-            self.hasPostEndTransactionChecker = True
-            self.postEndTransactionChecker = EndTransactionCheckerMaxDays( self.maxDays)
-        else:
-            self.endTransactionChecker = EndTransactionCheckerMean( self.mean )
+        self._setupPostTransactionCheckers()
 
 class EvalContinouslyMean2(EvalContinously):
 
-    def __init__(self, dbName, idxName, mean1, mean2, maxDays=0):
-        EvalContinously.__init__(self, dbName, idxName)
+    def __init__(self, dbName, idxName, mean1, mean2, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
+        EvalContinously.__init__(self, dbName, idxName, maxDays, maxLoss, maxJump)
         self.mean1 = mean1
         self.mean2 = mean2
-        self.maxDays = maxDays
 
     def _setupTransactionCheckers(self):
         self.startTransactionChecker = StartTransactionCheckerStrategie( [StartTransactionCheckerMean(self.mean1),
                                                                           StartTransactionCheckerMean(self.mean2)] )
         self.endTransactionChecker = EndTransactionCheckerMean( self.mean1 )
-        if self.maxDays > 0:
-            self.hasPostEndTransactionChecker = True
-            self.postEndTransactionChecker = EndTransactionCheckerStrategie( [ EndTransactionCheckerMaxDays( self.maxDays),
-                                                                               EndTransactionCheckerMaxLoss( -0.04 ) ] )
+        self._setupPostTransactionCheckers()
 
+class EvalContinouslyMean3(EvalContinously):
+
+    def __init__(self, dbName, idxName, mean1, mean2, mean3, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
+        EvalContinously.__init__(self, dbName, idxName, maxDays, maxLoss, maxJump)
+        self.mean1 = mean1
+        self.mean2 = mean2
+        self.mean3 = mean3
+        self.maxDays = maxDays
+        self.maxLoss = maxLoss
+        self.maxJump = maxJump
+        self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0)
+
+    def _setupTransactionCheckers(self):
+        self.startTransactionChecker = StartTransactionCheckerStrategie( [StartTransactionCheckerMean(self.mean1),
+                                                                          StartTransactionCheckerMean(self.mean2),
+                                                                          StartTransactionCheckerMean(self.mean3)] )
+        self.endTransactionChecker = EndTransactionCheckerMean( self.mean1 )
+        self._setupPostTransactionCheckers()
 
 
 

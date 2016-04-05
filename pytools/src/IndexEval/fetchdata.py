@@ -80,7 +80,6 @@ class FetchData():
             return( startDate.year, startDate.month )
 
         def _isEndOfPeriod(year, month, endDate):
-            checkIsEndOfPeriod = False
             checkIsEndOfPeriod = (year >= endDate.year)
             checkIsEndOfPeriod = checkIsEndOfPeriod and (month >= endDate.month)
             return checkIsEndOfPeriod

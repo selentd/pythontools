@@ -11,45 +11,97 @@ import evalrunner
 
 class TestEvalContinously(evalrunner.EvalRunner):
 
-    def __init__(self, mean, maxDays):
+    def __init__(self, mean, offset = 0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
         evalrunner.EvalRunner.__init__(self)
         self.mean = mean
         self.maxDays = maxDays
+        self.maxLoss = maxLoss
+        self.maxJump = maxJump
+        self.offset = offset
 
     def _setupResultCalculator(self):
         self.startInvest = 1000.0
-        self.fixedInvest = True
+        self.fixedInvest = False
         self.resultCalculator = evalresult.ResultCalculator()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20.0, self.startInvest, self.fixedInvest )
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
 
     def _createIndexEvaluation(self, indexName):
-        evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, self.mean, self.maxDays )
+        evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, self.mean, self.offset, self.maxDays, self.maxLoss, self.maxJump )
         return evaluation
 
 class TestEvalContinously2(evalrunner.EvalRunner):
 
-    def __init__(self, mean1, mean2, maxDays):
+    def __init__(self, mean1, mean2, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
         evalrunner.EvalRunner.__init__(self)
         self.mean1 = mean1
         self.mean2 = mean2
         self.maxDays = maxDays
+        self.maxLoss = maxLoss
+        self.maxJump = maxJump
 
     def _setupResultCalculator(self):
         self.startInvest = 1000.0
         self.fixedInvest = True
         self.resultCalculator = evalresult.ResultCalculator()
         self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 15.0, self.startInvest, self.fixedInvest )
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
 
     def _createIndexEvaluation(self, indexName):
-        evaluation = evalcontinously.EvalContinouslyMean2( self.dbName, indexName, self.mean1, self.mean2, self.maxDays )
+        evaluation = evalcontinously.EvalContinouslyMean2( self.dbName, indexName, self.mean1, self.mean2, self.maxDays, self.maxLoss, self.maxJump )
+        return evaluation
+
+class TestEvalContinously3(evalrunner.EvalRunner):
+
+    def __init__(self, mean1, mean2, mean3, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
+        evalrunner.EvalRunner.__init__(self)
+        self.mean1 = mean1
+        self.mean2 = mean2
+        self.mean3 = mean3
+        self.maxDays = maxDays
+        self.maxLoss = maxLoss
+        self.maxJump = maxJump
+
+    def _setupResultCalculator(self):
+        self.startInvest = 1000.0
+        self.fixedInvest = False
+        self.resultCalculator = evalresult.ResultCalculator()
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 10.0, self.startInvest, self.fixedInvest )
+
+    def _setupEvalResultPrinter(self):
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+
+    def _createIndexEvaluation(self, indexName):
+        evaluation = evalcontinously.EvalContinouslyMean3( self.dbName, indexName, self.mean1, self.mean2, self.mean3, self.maxDays, self.maxLoss, self.maxJump )
         return evaluation
 
 if __name__ == "__main__":
-    testEvaluation = TestEvalContinously2( 5, 21, 4 )
-    testEvaluation.run( "Mean 5/21" )
+
+    mean = 21
+    mean2 = 34
+    mean3 = 34
+    offset = 0.01
+    maxDays = 4
+    maxLoss = -0.04
+    maxJump = -0.04
+    descr = str.format("Mean {:3} {:3} {:3}", mean, mean2, mean3)
+
+    testEvaluation = TestEvalContinously3( mean, mean2, mean3 )
+    testEvaluation.run( descr )
+    print ""
+
+    testEvaluation = TestEvalContinously3( mean, mean2, mean3, maxDays, maxLoss )
+    testEvaluation.run( descr )
+    print ""
+
+    testEvaluation = TestEvalContinously3( mean, mean2, mean3, maxDays, maxLoss, maxJump )
+    testEvaluation.run( descr )
+    print ""
+

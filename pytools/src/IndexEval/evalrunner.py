@@ -12,13 +12,29 @@ import evalresult
 
 class EvalResultPrinter:
 
+    def printResultHead(self, descriptionStr ):
+        pass
+
     def printResult(self, indexName, descriptionStr, resultEvaluation):
         pass
 
 class EvalResultPrinterSimple:
 
+    def printResultHead(self, descriptionStr ):
+        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6} {:>6} {:>6} {:>6} {:>10}',
+                          "index",
+                          "descr",
+                          "tot",
+                          "win",
+                          "loss",
+                          "winR",
+                          "maxL",
+                          "maxw",
+                          "total",
+                          "total EUR" )
+
     def printResult(self, indexName, descriptionStr, resultEvaluation):
-        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6.2f} {: 6.3f} {:>6.3f} {:>10.2f}',
+        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f}',
                           indexName,
                           descriptionStr,
                           resultEvaluation.getTotalCount(),
@@ -26,6 +42,7 @@ class EvalResultPrinterSimple:
                           resultEvaluation.lossCount,
                           resultEvaluation.getWinRatio(),
                           resultEvaluation.maxLoss,
+                          resultEvaluation.maxWin,
                           resultEvaluation.getTotalResult(),
                           resultEvaluation.getTotalResultEuro() )
 
@@ -118,11 +135,13 @@ class EvalRunner(object):
         self.evaluationResultPrinter.printResult(indexName, descriptionStr, resultEvaluation)
 
     def runEvaluation(self, descriptionStr):
+        self.evaluationResultPrinter.printResultHead( descriptionStr )
         for indexName in self.allIndices:
             self.evaluateIndex( indexName, descriptionStr )
 
     def runIndex(self, indexName, descriptionStr = "" ):
         self.setUp()
+        self.evaluationResultPrinter.printResultHead( descriptionStr )
         self.evaluateIndex( indexName, descriptionStr )
         self.tearDown()
 

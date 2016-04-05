@@ -14,6 +14,7 @@ class PrintLastDayTransaction():
 
     def printResult( self, transactionResult, result, resultEuro, hasResult = True ):
         if hasResult:
+            pass
             '''
             for entry in transactionResult.indexHistory.indexHistory:
                 low = (entry.low / transactionResult.indexBuy.close)-1
@@ -29,7 +30,6 @@ class PrintLastDayTransaction():
                               transactionResult.lastDayResult - low,
                               transactionResult.lastDayResult - close )
 
-            '''
             print str.format( '{:%Y-%m-%d} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
@@ -39,6 +39,7 @@ class PrintLastDayTransaction():
                           transactionResult.indexBuy.mean200,
                           transactionResult.lastDayResult,
                           result )
+            '''
 
         else:
             print str.format( '{:%Y-%m-%d} {:6.2f}', transactionResult.indexSell.date, transactionResult.indexBuy.close )
