@@ -223,7 +223,6 @@ class EvalMonthlyInvestWithStopLoss(EvalMonthlyInvest):
         self.mean200Level = 0.97
 
     def _checkBreakUp(self, currentResult, idxSell):
-        breakUp = False
         # --- check for stop loss
         breakUp = (currentResult < self.stopLoss)
         # --- check for value < mean200

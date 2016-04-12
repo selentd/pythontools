@@ -9,7 +9,6 @@ import datetime
 from pymongo.mongo_client import MongoClient
 
 from indexdata import IndexData, IndexHistory
-import transactionchecker
 
 def _selectTrue( idxData ):
     return True

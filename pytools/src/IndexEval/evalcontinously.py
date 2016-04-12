@@ -5,8 +5,6 @@ Created on 17.03.2016
 '''
 
 import datetime
-import unittest
-
 
 import evalresult
 import fetchdata
@@ -14,6 +12,7 @@ import indexdata
 
 
 import transactionchecker
+
 
 class EvalContinously:
     '''

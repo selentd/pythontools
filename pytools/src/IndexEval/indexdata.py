@@ -328,6 +328,7 @@ class TransactionResult:
     def isValid(self):
         return (self.indexBuy.close) > 0 and (self.indexSell.close > 0)
 
+
 class TransactionResultHistory:
     '''
     IndexResultHistory defines the history of all transactions (index results) done for
