@@ -9,6 +9,7 @@ import datetime
 from pymongo.mongo_client import MongoClient
 
 from indexdata import IndexData, IndexHistory
+import transactionchecker
 
 def _selectTrue( idxData ):
     return True
@@ -97,6 +98,31 @@ class FetchData():
 
         return monthlyHistory
 
+    def fetchSelectedHistory(self, startDate, endDate, startFunc, endFunc):
+        isInTransaction = False
+        meanHistoryList = list()
+        idxHistory = IndexHistory()
+
+        for idxData in self.collection.find({'date': {'$gte': self.startDate, '$lt': self.endDate} }).sort('date'):
+            if isInTransaction:
+                if endFunc.checkEndTransaction( idxData, idxHistory.len() ):
+                    meanHistoryList.append( idxHistory )
+                    isInTransaction = False
+                else:
+                    idxHistory.addIndexData( idxData )
+
+
+            if not isInTransaction:
+                if startFunc.checkStartTransaction( idxData ):
+                    isInTransaction = True
+                    idxHistory = IndexHistory()
+                    idxHistory.addIndexData( idxData )
+                    endFunc.reset( idxData )
+
+        if isInTransaction:
+            meanHistoryList.append( idxHistory )
+
+        return meanHistoryList
 
 
 if __name__ == '__main__':
