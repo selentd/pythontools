@@ -7,7 +7,6 @@ Created on 21.10.2015
 import datetime
 import unittest
 
-
 import evalresult
 import fetchdata
 import indexdata
@@ -267,3 +266,4 @@ class EvalMonthlyInvestWithStopLossAndMaxWin(EvalMonthlyInvestWithStopLoss):
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
+
