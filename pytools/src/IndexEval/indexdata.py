@@ -289,6 +289,7 @@ class TransactionResult:
         self.indexSell = IndexData()
         self.indexHistory = IndexHistory()
         self.knockOut = False
+        self.indexName = ""
 
     def setResult(self, indexBuy, indexSell, knockOut = False):
         self.indexBuy = indexBuy

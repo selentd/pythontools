@@ -6,9 +6,9 @@ Created on 15.02.2015
 
 import datetime
 
-from pymongo.mongo_client import MongoClient
-
 from indexdata import IndexData, IndexHistory
+
+import indexdatabase
 
 def _selectTrue( idxData ):
     return True
@@ -18,19 +18,17 @@ class FetchData():
     classdocs
     '''
 
-    def __init__(self, dbName, indexName):
+    def __init__(self, indexName):
         '''
         Constructor
         '''
-        self.dbName = dbName
         self.indexName = indexName
         self.startDate = datetime.datetime(1900, 01, 01)
         self.endDate = datetime.datetime.today()
         self.selectFunc = _selectTrue
 
-        self.mongoClient = MongoClient()
-        self.database = self.mongoClient[self.dbName]
-        self.collection = self.database[self.indexName]
+        self.indexDB = indexdatabase.getIndexDatabase()
+        self.collection = self.indexDB.getIndexCollection(self.indexName)
         self.selectFunc = _selectTrue
 
     def _fetchData(self, select):
@@ -123,10 +121,35 @@ class FetchData():
 
         return meanHistoryList
 
+    def fetchHistoryValue(self, year, month, day):
+        searchDate = datetime.datetime( year, month, day )
+        startDate = searchDate
+        startDate = startDate + datetime.timedelta(-1)
+        if self.collection.find_one({'date': {'$lt': searchDate} }) != None:
+            entry = None
+            while entry == None:
+                entry = self.collection.find_one({'date': {'$gte': startDate, '$lt': searchDate} })
+                if entry == None:
+                    startDate = startDate + datetime.timedelta(-1)
+
+            idxEntry = IndexData()
+            idxEntry.setDictionary(entry)
+            return idxEntry
+        else:
+            return None
+
+    def fetchLastDayOfMonth(self, year, month):
+        if month == 12:
+            month = 1
+            year = year + 1
+        else:
+            month = month+1
+
+        return self.fetchHistoryValue( year, month, 1)
 
 if __name__ == '__main__':
     start = datetime.datetime(1998, 01, 02, 0, 0);
     end = datetime.datetime(1998, 02, 01, 0, 0)
 
-    fetchData = FetchData('stockdb', 'dax',)
+    fetchData = FetchData( 'dax',)
     fetchData.fetchDataByDate( start, end )

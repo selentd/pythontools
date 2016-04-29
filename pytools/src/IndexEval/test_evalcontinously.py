@@ -8,7 +8,6 @@ import evalcontinously
 import evalresult
 import evalrunner
 
-
 class TestEvalContinously(evalrunner.EvalRunner):
 
     def __init__(self, mean, offset = 0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     mean2 = 34
     mean3 = 34
     offset = 0.01
-    maxDays = 4
+    maxDays = 100
     maxLoss = -0.04
     maxJump = -0.04
     descr = str.format("Mean {:3} {:3} {:3}", mean, mean2, mean3)

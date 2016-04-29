@@ -83,7 +83,7 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         self.distance = distance
         self.k = 1.1302864364
         self.d = 0.2029128054
-        self.maxInvest = 10000.0
+        self.maxInvest = 100000.0
 
     def calcResult(self, buy, sell):
         result = ResultCalculator().calcResult(buy, sell)
@@ -101,8 +101,8 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
                 result = self.total * percCalc
 
         self.total += result
-        if self.total < 0:
-            self.total = 1000.0
+        if self.total < self.invest:
+            self.total = self.invest
 
         return result
 

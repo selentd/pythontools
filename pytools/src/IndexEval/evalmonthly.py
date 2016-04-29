@@ -25,7 +25,7 @@ class EvalMonthly:
         self.startDate = startDate
         self.endDate = endDate
 
-        self.monthlyHistory = fetchdata.FetchData( self.dbName, self.idxName ).fetchMonthlyHistory(self.startDate, self.endDate)
+        self.monthlyHistory = fetchdata.FetchData( self.idxName ).fetchMonthlyHistory(self.startDate, self.endDate)
 
     def calculateResult(self):
         return indexdata.TransactionResultHistory()

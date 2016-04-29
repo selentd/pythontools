@@ -9,6 +9,7 @@ import datetime
 from pymongo.mongo_client import MongoClient
 
 import evalresult
+import indexdatabase
 
 class EvalResultPrinter:
 
@@ -21,7 +22,7 @@ class EvalResultPrinter:
 class EvalResultPrinterSimple:
 
     def printResultHead(self, descriptionStr ):
-        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6} {:>6} {:>6} {:>6} {:>10}',
+        print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6} {:>6} {:>6} {:>6} {:>10}',
                           "index",
                           "descr",
                           "tot",
@@ -34,7 +35,7 @@ class EvalResultPrinterSimple:
                           "total EUR" )
 
     def printResult(self, indexName, descriptionStr, resultEvaluation):
-        print str.format( '{:10} {:15} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f}',
+        print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f}',
                           indexName,
                           descriptionStr,
                           resultEvaluation.getTotalCount(),
@@ -79,8 +80,10 @@ class EvalRunner(object):
                            self.idxFTS100, self.idxFtseMib, self.idxHangSeng, self.idxIbex, self.idxMDax,
                            self.idxNasdaq100, self.idxNikkei, self.idxSDax, self.idxSMI, self.idxTecDax]
 
-        self.mongoClient = MongoClient()
-        self.database = self.mongoClient[self.dbName]
+        self.indexDB = indexdatabase.getIndexDatabase()
+
+        self.transactionListDict = dict()
+        self.resultEvaluationDict = dict()
 
     def _setupStartEndTime(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
@@ -133,6 +136,8 @@ class EvalRunner(object):
         transactionList.evaluateResult( resultEvaluation, self.resultTransactionPrinter )
 
         self.evaluationResultPrinter.printResult(indexName, descriptionStr, resultEvaluation)
+        self.transactionListDict[indexName] = transactionList
+        self.resultEvaluationDict[indexName] = resultEvaluation
 
     def runEvaluation(self, descriptionStr):
         self.evaluationResultPrinter.printResultHead( descriptionStr )

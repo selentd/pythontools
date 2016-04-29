@@ -26,5 +26,5 @@ class EvalTurnaround:
         self.startDate = startDate
         self.endDate = endDate
 
-        self.meandHistory = fetchdata.FetchData( self.dbName, self.idxName ).fetchSelectedHistory(self.startDate, self.endDate, self.selectFunc)
+        self.meandHistory = fetchdata.FetchData( self.idxName ).fetchSelectedHistory(self.startDate, self.endDate, self.selectFunc)
 

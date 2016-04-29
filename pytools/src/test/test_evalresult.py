@@ -73,7 +73,7 @@ class EvalResultTest(unittest.TestCase):
     def testEvalResultCall(self):
         evaluation = evalresult.EvalResultCall( "test dax", 1000.0 )
         transactionResultList = indexdata.TransactionResultHistory()
-        monthlyHistory = fetchdata.FetchData( self.dbName, self.idxDax ).fetchMonthlyHistory(self.startDate, self.endDate)
+        monthlyHistory = fetchdata.FetchData( self.idxDax ).fetchMonthlyHistory(self.startDate, self.endDate)
 
         for historyList in monthlyHistory:
             transactionResult = indexdata.TransactionResult()
