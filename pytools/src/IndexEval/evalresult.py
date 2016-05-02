@@ -59,7 +59,16 @@ class ResultCalculatorEuro(ResultCalculator):
 
         self.invest = invest
         self.total = invest
+        self.totalInvest = invest
         self.fixInvest = fixInvest
+
+    def _checkTotal(self):
+        if self.total < 0:
+            self.total = 0
+
+        if self.total < self.invest:
+            self.totalInvest = self.totalInvest +(self.invest - self.total)
+            self.total = self.invest
 
     def calcResult(self, buy, sell):
         result = ResultCalculator().calcResult(buy, sell)
@@ -69,9 +78,7 @@ class ResultCalculatorEuro(ResultCalculator):
             result *= self.total
 
         self.total += result
-        if self.total < 0:
-            self.total = 0
-
+        self._checkTotal()
         return result
 
     def reset(self):
@@ -101,8 +108,7 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
                 result = self.total * percCalc
 
         self.total += result
-        if self.total < self.invest:
-            self.total = self.invest
+        self._checkTotal()
 
         return result
 
