@@ -84,6 +84,9 @@ class ResultCalculatorEuro(ResultCalculator):
     def reset(self):
         self.total = self.invest
 
+    def getTotalInvest(self):
+        return self.totalInvest
+
 class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
     def __init__(self, distance, invest, fixInvest = True):
         ResultCalculatorEuro.__init__(self, invest, fixInvest)
@@ -103,7 +106,7 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
             result = self.invest * percCalc
         else:
             if self.total > self.maxInvest:
-                result = (self.total / 2) * percCalc
+                result = (self.maxInvest) * percCalc
             else:
                 result = self.total * percCalc
 
@@ -174,6 +177,9 @@ class EvalResult:
 
     def getTotalResultEuro(self):
         return self.resultCalculatorEuro.getTotal()
+
+    def getTotalInvestEuro(self):
+        return self.resultCalculatorEuro.getTotalInvest()
 
     def getWinRatio(self):
         if (self.getTotalCount() > 0):

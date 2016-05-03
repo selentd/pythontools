@@ -162,13 +162,15 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printResultLooser(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
+                          transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
                           transactionResult.indexSell.close,
                           transactionResult.getLowValue(),
                           transactionResult.getHighValue(),
+                          resultEuro,
                           result,
                           (buy / transactionResult.indexBuy.mean8)-1.0,
                           (buy / transactionResult.indexBuy.mean13)-1.0,
@@ -181,13 +183,15 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printResultWinner(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
+                          transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
                           transactionResult.indexBuy.close,
                           transactionResult.indexSell.close,
                           transactionResult.getLowValue(),
                           transactionResult.getHighValue(),
+                          resultEuro,
                           result,
                           (buy / transactionResult.indexBuy.mean8)-1.0,
                           (buy / transactionResult.indexBuy.mean13)-1.0,
@@ -270,7 +274,7 @@ class MulitEvalRunner:
         self.endDate = datetime.datetime( 2016, 1, 1 )
 
     def _setupEvaluationPeriod(self):
-        self.periodDays = 7
+        self.periodDays = 1
 
     def _setupIndexSelector(self):
         self.indexSelector = IndexSelectorRaiseAvg12M()
@@ -290,8 +294,8 @@ class MulitEvalRunner:
         self.excludeChecker = evalresult.ExcludeTransaction()
 
     def _setupTransactionPrinter(self):
-        #self.resultTransactionPrinter = MultiEvalPrinter()
-        self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
+        self.resultTransactionPrinter = MultiEvalPrinter()
+        #self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
@@ -416,13 +420,13 @@ class TestEvalContinously3(evalrunner.EvalRunner):
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     mean = 21
-    mean2 = 89
-    mean3 = 200
+    mean2 = 21
+    mean3 = 21
     offset = 0.01
     maxDays = 100
-    maxLoss = -0.02
+    maxLoss = -0.01
     maxJump = -0.02
-    maxWin = 0.0
+    maxWin = 0.00
     descr = str.format("Mean {:3} {:3} {:3}", mean, mean2, mean3)
 
     '''

@@ -22,8 +22,8 @@ class TestEvalContinously(evalrunner.EvalRunner):
         self.startInvest = 1000.0
         self.fixedInvest = False
         self.resultCalculator = evalresult.ResultCalculator()
-        self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
-        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20.0, self.startInvest, self.fixedInvest )
+        #self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+        self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( 20.0, self.startInvest, self.fixedInvest )
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
@@ -83,15 +83,33 @@ class TestEvalContinously3(evalrunner.EvalRunner):
 
 if __name__ == "__main__":
 
-    mean = 21
+    mean = 200
     mean2 = 34
     mean3 = 34
-    offset = 0.01
+    offset = 0.00
     maxDays = 100
-    maxLoss = -0.04
-    maxJump = -0.04
-    descr = str.format("Mean {:3} {:3} {:3}", mean, mean2, mean3)
+    maxLoss = -0.08
+    maxJump = -0.02
 
+    descr = str.format("Mean {:3} {:3.2f} {:3.2f}", mean, offset, maxLoss)
+    testEvaluation = TestEvalContinously( mean, offset, maxLoss )
+    testEvaluation.run( descr )
+    print ""
+
+    offset = 0.01
+    descr = str.format("Mean {:3} {:3.2f} {:3.2f}", mean, offset, maxLoss)
+    testEvaluation = TestEvalContinously( mean, offset, maxLoss )
+    testEvaluation.run( descr )
+    print ""
+
+    offset = 0.03
+    descr = str.format("Mean {:3} {:3.2f} {:3.2f}", mean, offset, maxLoss)
+    testEvaluation = TestEvalContinously( mean, offset, maxLoss )
+    testEvaluation.run( descr )
+    print ""
+
+    mean = 21
+    descr = str.format("Mean {:3} {:3} {:3}", mean, mean2, mean3)
     testEvaluation = TestEvalContinously3( mean, mean2, mean3 )
     testEvaluation.run( descr )
     print ""
