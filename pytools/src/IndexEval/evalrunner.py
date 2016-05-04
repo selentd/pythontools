@@ -32,8 +32,8 @@ class EvalResultPrinterSimple:
                           "maxL",
                           "maxw",
                           "total",
-                          "total EUR",
-                          "invest EUR" )
+                          "total-EUR",
+                          "invest-EUR" )
 
     def printResult(self, indexName, descriptionStr, resultEvaluation):
         print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}',
@@ -55,8 +55,10 @@ class EvalRunner(object):
     Base class to run an evaluation of an index.
     '''
     startInvestKey = "startInvest"
+    maxInvestKey   = "maxInvest"
     fixedInvestKey = "fixedInvest"
     idxDistanceKey = "idxDistance"
+    isCallKey      = "isCall"
 
     def __init__(self, runParameters = None):
         '''
@@ -98,21 +100,48 @@ class EvalRunner(object):
         self.endDate = datetime.datetime( 2016, 1, 1 )
 
     def _setupResultCalculator(self):
-        if self.runParameters.has_key("startInvest"):
-            self.startInvest = self.runParameters["startInvest"]
+        if self.runParameters.has_key(EvalRunner.startInvestKey):
+            self.startInvest = self.runParameters[EvalRunner.startInvestKey]
         else:
             self.startInvest = 1000.0
-        if self.runParameters.has_key("fixedInvest"):
-            self.fixedInvest = self.runParameters["fixedInvest"]
+
+        if self.runParameters.has_key(EvalRunner.maxInvestKey):
+            self.maxInvest = self.runParameters[EvalRunner.maxInvestKey]
+        else:
+            self.maxInvest = self.startInvest
+
+        if self.runParameters.has_key(EvalRunner.fixedInvestKey):
+            self.fixedInvest = self.runParameters[EvalRunner.fixedInvestKey]
         else:
             self.fixedInvest = True
 
-        self.resultCalculator = evalresult.ResultCalculator()
-
-        if self.runParameters.has_key("idxDistance"):
-            self.resultCalculatorEuro =evalresult.ResultCalculatorEuroLeverage( self.runParameters["idxDistance"], self.startInvest, self.fixedInvest)
+        if self.runParameters.has_key(EvalRunner.isCallKey):
+            self.isCall = self.runParameters[EvalRunner.isCallKey]
         else:
-            self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest)
+            self.isCall = True
+
+        if self.isCall:
+            self.resultCalculator = evalresult.ResultCalculator()
+        else:
+            self.resultCalculator = evalresult.ResultCalculatorPut()
+
+        if self.runParameters.has_key(EvalRunner.idxDistanceKey):
+            if self.isCall:
+                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( self.runParameters[EvalRunner.idxDistanceKey],
+                                                                                     self.startInvest,
+                                                                                     self.fixedInvest,
+                                                                                     self.maxInvest )
+            else:
+                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeveragePut( self.runParameters[EvalRunner.idxDistanceKey],
+                                                                                        self.startInvest,
+                                                                                        self.fixedInvest,
+                                                                                        self.maxInvest )
+
+        else:
+            if self.isCall:
+                self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest, self.maxInvest)
+            else:
+                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroPut(self.startInvest, self.fixedInvest, self.maxInvest)
 
     def _setupResultExcludeChecker(self):
         self.excludeChecker = evalresult.ExcludeTransaction()
@@ -137,7 +166,7 @@ class EvalRunner(object):
         self.resultCalculator.reset()
         self.resultCalculatorEuro.reset()
 
-        resultEvaluation = evalresult.EvalResultCall( indexName + " " + descriptionStr, self.startInvest, self.fixedInvest )
+        resultEvaluation = evalresult.EvalResult( indexName + " " + descriptionStr, self.startInvest, self.fixedInvest )
         resultEvaluation.setExcludeChecker( self.excludeChecker )
         resultEvaluation.setResultCalculator(self.resultCalculator )
         resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)

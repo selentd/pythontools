@@ -10,8 +10,8 @@ import evalrunner
 
 class TestEvalContinously(evalrunner.EvalRunner):
 
-    def __init__(self, mean, offset = 0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
-        evalrunner.EvalRunner.__init__(self)
+    def __init__(self, runParameters):
+        evalrunner.EvalRunner.__init__(self, runParameters)
         self.mean = mean
         self.maxDays = maxDays
         self.maxLoss = maxLoss

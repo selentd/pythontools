@@ -47,6 +47,23 @@ class StartTransactionCheckerMean(StartTransactionChecker):
 
         return startTransaction
 
+class StartTransactionCheckerGrad(StartTransactionChecker):
+
+    def __init__(self, grad, minGrad=0.0, isCall=True):
+        self.grad = grad
+        self.minGrad = minGrad
+        self.isCall = isCall
+
+    def checkStartTransaction(self, idxData):
+        startTransaction = False
+        gradValue = idxData.getGradValue( self.grad ) - self.minGrad
+        if gradValue != 0.0:
+            if self.isCall:
+                startTransaction = (gradValue > 0.0)
+            else:
+                startTransaction = (gradValue < 0.0)
+        return startTransaction
+
 class EndTransactionChecker:
 
     def __init__(self):

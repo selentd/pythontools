@@ -19,13 +19,31 @@ class EvalContinously:
     classdocs
     '''
 
-    def __init__(self, dbName, idxName, maxWin=0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
+    maxDaysKey = "maxDays"
+    maxWinKey  = "maxWin"
+    maxLossKey = "maxLoss"
+    maxJumpKey = "maxJump"
+
+    def __init__(self, dbName, idxName, runParameters = None):
         self.dbName = dbName
         self.idxName = idxName
-        self.maxDays = maxDays
-        self.maxLoss = maxLoss
-        self.maxJump = maxJump
-        self.maxWin = maxWin
+        if runParameters != None:
+            self.runParameters = runParameters
+            if self.runParameters.has_key(EvalContinously.maxDaysKey):
+                self.maxDays = self.runParameters[EvalContinously.maxDaysKey]
+            if self.runParameters.has_key(EvalContinously.maxWinKey):
+                self.maxWin = self.runParameters[EvalContinously.maxWinKey]
+            if self.runParameters.has_key(EvalContinously.maxLossKey):
+                self.maxLoss = self.runParameters[EvalContinously.maxLossKey]
+            if self.runParameters.has_key(EvalContinously.maxJumpKey):
+                self.maxJump = self.runParameters[EvalContinously.maxJumpKey]
+        else:
+            self.runParameters = dict()
+            self.maxDays = 0
+            self.maxWin  = 0.0
+            self.maxLoss = 0.0
+            self.maxJump = 0.0
+
         self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin > 0.0)
         self.postEndTransactionChecker = transactionchecker.EndTransactionChecker()
 
@@ -112,45 +130,131 @@ class EvalContinously:
 
 class EvalContinouslyMean(EvalContinously):
 
-    def __init__(self, dbName, idxName, mean, offset = 0.0, maxWin=0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
-        EvalContinously.__init__(self, dbName, idxName, maxWin, maxDays, maxLoss, maxJump)
-        self.mean = mean
-        self.offset = offset
+    isCallKey       = "isCall"
+    meanKey         = "mean"
+    mean2Key        = "mean2"
+    mean3Key        = "mean3"
+    mean4Key        = "mean4"
+    mean5Key        = "mean5"
+    gradKey         = "grad"
+    grad2Key        = "grad2"
+    grad3Key        = "grad3"
+    minGradKey      = "minGrad"
+    minGrad2Key     = "minGrad2"
+    minGrad3Key     = "minGrad3"
+    startOffsetKey  = "startOfset"
+    endOffsetKey    = "endOffset"
 
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalContinously.__init__(self, dbName, idxName, runParameters)
 
-    def _setupTransactionCheckers(self):
-        self.startTransactionChecker = transactionchecker.StartTransactionCheckerMean( self.mean, self.offset )
-        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean )
-        self._setupPostTransactionCheckers()
+        if self.runParameters.has_key( EvalContinouslyMean.isCallKey):
+            self.isCall = self.runParameters[EvalContinouslyMean.isCallKey]
+        else:
+            self.isCall = True
 
-class EvalContinouslyMean2(EvalContinously):
+        if self.runParameters.has_key( EvalContinouslyMean.meanKey):
+            self.mean = self.runParameters[EvalContinouslyMean.meanKey]
+        else:
+            self.mean = 200
 
-    def __init__(self, dbName, idxName, mean1, mean2, maxWin=0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
-        EvalContinously.__init__(self, dbName, idxName, maxWin, maxDays, maxLoss, maxJump)
-        self.mean1 = mean1
-        self.mean2 = mean2
+        if self.runParameters.has_key( EvalContinouslyMean.startOffsetKey):
+            self.startOffset = self.runParameters[EvalContinouslyMean.startOffsetKey]
+        else:
+            self.startOffset = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.endOffsetKey):
+            self.endOffset = self.runParameters[EvalContinouslyMean.endOffsetKey]
+        else:
+            self.endOffset = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.gradKey ):
+            self.grad = self.runParameters[EvalContinouslyMean.gradKey]
+        else:
+            self.grad = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.minGradKey):
+            self.minGrad = self.runParameters[EvalContinouslyMean.minGradKey]
+        else:
+            self.minGrad = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.grad2Key ):
+            self.grad2 = self.runParameters[EvalContinouslyMean.grad2Key]
+        else:
+            self.grad2 = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.minGrad2Key):
+            self.minGrad2 = self.runParameters[EvalContinouslyMean.minGrad2Key]
+        else:
+            self.minGrad2 = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.grad3Key ):
+            self.grad3 = self.runParameters[EvalContinouslyMean.grad3Key]
+        else:
+            self.grad3 = 0.0
+
+        if self.runParameters.has_key( EvalContinouslyMean.minGrad3Key):
+            self.minGrad3 = self.runParameters[EvalContinouslyMean.minGrad3Key]
+        else:
+            self.minGrad3 = 0.0
+
+    def _setupStartGradTransactionCheckers(self):
+        if self.grad != 0.0:
+            self.startTransactionChecker.addTransactionChecker(transactionchecker.StartTransactionCheckerGrad(self.grad, self.minGrad, self.isCall))
+
+        if self.grad2 != 0.0:
+            self.startTransactionChecker.addTransactionChecker(transactionchecker.StartTransactionCheckerGrad(self.grad2, self.minGrad2, self.isCall))
+
+        if self.grad3 != 0.0:
+            self.startTransactionChecker.addTransactionChecker(transactionchecker.StartTransactionCheckerGrad(self.grad3, self.minGrad3, self.isCall))
 
     def _setupTransactionCheckers(self):
         self.startTransactionChecker = transactionchecker.StartTransactionCheckerStrategie(
-                                                                [transactionchecker.StartTransactionCheckerMean(self.mean1),
-                                                                 transactionchecker.StartTransactionCheckerMean(self.mean2)] )
-        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean1 )
+                                                                [transactionchecker.StartTransactionCheckerMean(self.mean, self.startOffset, self.isCall)] )
+
+        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, self.isCall )
         self._setupPostTransactionCheckers()
 
-class EvalContinouslyMean3(EvalContinously):
+class EvalContinouslyMean2(EvalContinouslyMean):
 
-    def __init__(self, dbName, idxName, mean1, mean2, mean3, maxWin=0.0, maxDays=0, maxLoss = 0.0, maxJump = 0.0):
-        EvalContinously.__init__(self, dbName, idxName, maxWin, maxDays, maxLoss, maxJump)
-        self.mean1 = mean1
-        self.mean2 = mean2
-        self.mean3 = mean3
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalContinouslyMean.__init__(self, dbName, idxName, runParameters)
+
+        if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
+            self.mean2 = self.runParameters[EvalContinouslyMean.mean2Key]
+        else:
+            self.mean2 = self.mean
 
     def _setupTransactionCheckers(self):
         self.startTransactionChecker = transactionchecker.StartTransactionCheckerStrategie(
-                                                                        [transactionchecker.StartTransactionCheckerMean(self.mean1),
-                                                                         transactionchecker.StartTransactionCheckerMean(self.mean2),
-                                                                         transactionchecker.StartTransactionCheckerMean(self.mean3)] )
-        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean1 )
+                                                                [transactionchecker.StartTransactionCheckerMean(self.mean, 0.0, self.isCall),
+                                                                 transactionchecker.StartTransactionCheckerMean(self.mean2, 0.0, self.isCall)] )
+        self._setupStartGradTransactionCheckers()
+        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, self.isCall )
+        self._setupPostTransactionCheckers()
+
+class EvalContinouslyMean3(EvalContinouslyMean):
+
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalContinouslyMean.__init__(self, dbName, idxName, runParameters)
+
+        if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
+            self.mean2 = self.runParameters[EvalContinouslyMean.mean2Key]
+        else:
+            self.mean2 = self.mean
+
+        if self.runParameters.has_key(EvalContinouslyMean.mean3Key):
+            self.mean3 = self.runParameters[EvalContinouslyMean.mean3Key]
+        else:
+            self.mean3 = self.mean
+
+    def _setupTransactionCheckers(self):
+        self.startTransactionChecker = transactionchecker.StartTransactionCheckerStrategie(
+                                                                        [transactionchecker.StartTransactionCheckerMean(self.mean, 0.0, self.isCall),
+                                                                         transactionchecker.StartTransactionCheckerMean(self.mean2, 0.0, self.isCall),
+                                                                         transactionchecker.StartTransactionCheckerMean(self.mean3, 0.0, self.isCall)] )
+        self._setupStartGradTransactionCheckers()
+        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, self.isCall )
         self._setupPostTransactionCheckers()
 
 

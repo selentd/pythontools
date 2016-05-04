@@ -50,17 +50,26 @@ class ResultCalculator:
     def getTotal(self):
         return self.total
 
+class ResultCalculatorPut(ResultCalculator):
+
+    def __init__(self):
+        ResultCalculator.__init__(self)
+
+    def calcResult(self, buy, sell):
+        return ResultCalculator.calcResult(self, sell, buy)
+
 class ResultCalculatorEuro(ResultCalculator):
     '''
     Base class to calculate a transaction result in Euros
     '''
-    def __init__(self, invest, fixInvest = True):
+    def __init__(self, invest, fixInvest = True, maxInvest = 0.0):
         ResultCalculator.__init__(self)
 
         self.invest = invest
         self.total = invest
         self.totalInvest = invest
         self.fixInvest = fixInvest
+        self.maxInvest = maxInvest
 
     def _checkTotal(self):
         if self.total < 0:
@@ -83,17 +92,25 @@ class ResultCalculatorEuro(ResultCalculator):
 
     def reset(self):
         self.total = self.invest
+        self.totalInvest = self.invest
 
     def getTotalInvest(self):
         return self.totalInvest
 
+class ResultCalculatorEuroPut(ResultCalculatorEuro):
+
+    def __init__(self, invest, fixInvest = True, maxInvest = 0.0):
+        ResultCalculatorEuro.__init__(self, invest, fixInvest, maxInvest)
+
+    def calcResult(self, buy, sell):
+        return ResultCalculatorEuro.calcResult(self, sell, buy)
+
 class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
-    def __init__(self, distance, invest, fixInvest = True):
-        ResultCalculatorEuro.__init__(self, invest, fixInvest)
+    def __init__(self, distance, invest, fixInvest = True, maxInvest = 0.0):
+        ResultCalculatorEuro.__init__(self, invest, fixInvest, maxInvest)
         self.distance = distance
         self.k = 1.1302864364
         self.d = 0.2029128054
-        self.maxInvest = 100000.0
 
     def calcResult(self, buy, sell):
         result = ResultCalculator().calcResult(buy, sell)
@@ -105,7 +122,7 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         if self.fixInvest:
             result = self.invest * percCalc
         else:
-            if self.total > self.maxInvest:
+            if (self.maxInvest > 0.0) and (self.total > self.maxInvest):
                 result = (self.maxInvest) * percCalc
             else:
                 result = self.total * percCalc
@@ -114,6 +131,13 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         self._checkTotal()
 
         return result
+
+class ResultCalculatorEuroLeveragePut(ResultCalculatorEuroLeverage):
+    def __init__(self, distance, invest, fixInvest = True, maxInvest = 0.0):
+        ResultCalculatorEuroLeverage.__init__(self, distance, invest, fixInvest, maxInvest)
+
+    def calcResult(self, buy, sell):
+        return ResultCalculatorEuroLeverage.calcResult(self, sell, buy)
 
 class EvalResult:
     '''
@@ -210,7 +234,10 @@ class EvalResult:
             self.evaluate( transactionResult, resultPrinter )
 
     def _updateResult(self, transactionResult, result, resultEuro ):
-        pass
+        if result < 0.0:
+            self._updateLoss(result, resultEuro)
+        else:
+            self._updateWin(result, resultEuro)
 
     def evaluate(self, transactionResult, resultPrinter = None):
         hasResult = False
@@ -224,24 +251,4 @@ class EvalResult:
 
             if resultPrinter:
                 resultPrinter.printResult( transactionResult, result, resultEuro, hasResult )
-
-class EvalResultCall( EvalResult ):
-    def __init__(self, name, invest, fixInvest = True):
-        EvalResult.__init__(self, name, invest, fixInvest)
-
-    def _updateResult(self, transactionResult, result, resultEuro):
-        if (transactionResult.indexSell.close > transactionResult.indexBuy.close):
-            self._updateWin(result, resultEuro)
-        else:
-            self._updateLoss(result, resultEuro)
-
-class EvalResultPut( EvalResult ):
-    def __init__(self, name, invest, fixInvest = True):
-        EvalResult.__init__(self, name, invest, fixInvest)
-
-    def _updateResult(self, transactionResult, result, resultEuro):
-        if (transactionResult.indexSell.close < transactionResult.indexBuy.close):
-            self._updateWin(result, resultEuro)
-        else:
-            self._updateLoss(result, resultEuro)
 

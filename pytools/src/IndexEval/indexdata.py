@@ -26,7 +26,7 @@ class MeanSet:
         def __init__(self, size):
             self.meanSize = size
             self.valueQueue = collections.deque()
-            self.meanValue = 0
+            self.meanValue = 0.0
 
         def addValue(self, value):
             if len(self.valueQueue) < self.meanSize:
@@ -41,7 +41,14 @@ class MeanSet:
             if len(self.valueQueue) == self.meanSize:
                 return self.meanValue / self.meanSize
             else:
-                return 0
+                return 0.0
+
+        def getDiffValue(self):
+            if len(self.valueQueue) < self.meanSize:
+                return 0.0
+            else:
+                return (self.valueQueue[self.meanSize-1] / self.valueQueue[0]) - 1.0
+
 
     def __init__(self):
         self.mean5 = self.MeanData(5)
@@ -97,6 +104,19 @@ class IndexData:
         self.mean144 = 0
         self.mean200 = 0
         self.mean233 = 0
+        self.grad5 = 0.0
+        self.grad8 = 0.0
+        self.grad13 = 0.0
+        self.grad21 = 0.0
+        self.grad34 = 0.0
+        self.grad38 = 0.0
+        self.grad50 = 0.0
+        self.grad55 = 0.0
+        self.grad89 = 0.0
+        self.grad100 = 0.0
+        self.grad144 = 0.0
+        self.grad200 = 0.0
+        self.grad233 = 0.0
 
     def _checkData(self):
         if self.low > self.high:
@@ -172,6 +192,35 @@ class IndexData:
         else:
             pass
 
+    def getGradValue(self, grad):
+        if grad == 5:
+            return self.grad5
+        elif grad == 8:
+            return self.grad8
+        elif grad == 13:
+            return self.grad13
+        elif grad == 21:
+            return self.grad21
+        elif grad == 34:
+            return self.grad34
+        elif grad == 38:
+            return self.grad38
+        elif grad == 50:
+            return self.grad50
+        elif grad == 55:
+            return self.grad55
+        elif grad == 89:
+            return self.grad89
+        elif grad == 100:
+            return self.grad100
+        elif grad == 144:
+            return self.grad144
+        elif grad == 200:
+            return self.grad200
+        elif grad == 233:
+            return self.grad233
+        else:
+            return 0.0
 
     def setMean(self, mean):
         self.mean5 = mean.mean5.getMeanValue()
@@ -187,6 +236,21 @@ class IndexData:
         self.mean144 = mean.mean144.getMeanValue()
         self.mean200 = mean.mean200.getMeanValue()
         self.mean233 = mean.mean233.getMeanValue()
+
+    def setGrad(self, mean):
+        self.grad5 = mean.mean5.getDiffValue()
+        self.grad8 = mean.mean8.getDiffValue()
+        self.grad13 = mean.mean13.getDiffValue()
+        self.grad21 = mean.mean21.getDiffValue()
+        self.grad34 = mean.mean34.getDiffValue()
+        self.grad38 = mean.mean38.getDiffValue()
+        self.grad50 = mean.mean50.getDiffValue()
+        self.grad55 = mean.mean55.getDiffValue()
+        self.grad89 = mean.mean89.getDiffValue()
+        self.grad100 = mean.mean100.getDiffValue()
+        self.grad144 = mean.mean144.getDiffValue()
+        self.grad200 = mean.mean200.getDiffValue()
+        self.grad233 = mean.mean233.getDiffValue()
 
     def getDictionary(self):
         return { "date": datetime.datetime(self.date.year,
@@ -208,7 +272,20 @@ class IndexData:
                  "mean100": self.mean100,
                  "mean144": self.mean144,
                  "mean200": self.mean200,
-                 "mean233": self.mean233 }
+                 "mean233": self.mean233,
+                 "grad5": self.grad5,
+                 "grad8": self.grad8,
+                 "grad13": self.grad13,
+                 "grad21": self.grad21,
+                 "grad34": self.grad34,
+                 "grad38": self.grad38,
+                 "grad50": self.grad50,
+                 "grad55": self.grad55,
+                 "grad89": self.grad89,
+                 "grad100": self.grad100,
+                 "grad144": self.grad144,
+                 "grad200": self.grad200,
+                 "grad233": self.grad233 }
 
     def setDictionary(self, data):
         self.date = data["date"]
@@ -229,6 +306,19 @@ class IndexData:
         self.mean144 = data["mean144"]
         self.mean200 = data["mean200"]
         self.mean233 = data["mean233"]
+        self.grad5 = data["grad5"]
+        self.grad8 = data["grad8"]
+        self.grad13 = data["grad13"]
+        self.grad21 = data["grad21"]
+        self.grad34 = data["grad34"]
+        self.grad38 = data["grad38"]
+        self.grad50 = data["grad50"]
+        self.grad55 = data["grad55"]
+        self.grad89 = data["grad89"]
+        self.grad100 = data["grad100"]
+        self.grad144 = data["grad144"]
+        self.grad200 = data["grad200"]
+        self.grad233 = data["grad233"]
         self._checkData()
 
 class IndexHistory:
