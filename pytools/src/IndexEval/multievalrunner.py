@@ -153,6 +153,34 @@ class IndexSelectorRaiseAvg12M(IndexSelector):
 
         return (hasResult, result)
 
+class IndexSelectorRaiseAvg12MWeighted(IndexSelector):
+
+    def _calcIndexValue(self, idxName, startDate, endDate ):
+        hasResult = False
+        result = 0.0
+
+        fetch = fetchdata.FetchData( idxName )
+        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
+
+        diffDate = self._calcMonthDiff(startDate, 12)
+        idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
+        diffDate = self._calcMonthDiff(startDate, 6 )
+        idxData6M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
+        diffDate = self._calcMonthDiff(startDate, 3 )
+        idxData3M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
+        diffDate = self._calcMonthDiff(startDate, 1 )
+        idxData1M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
+
+        hasResult = (idxDataStart != None and idxData12M != None and idxData6M != None and idxData3M != None and idxData1M != None)
+        if hasResult:
+            result = (idxDataStart.close / idxData12M.close) - 1.0
+            result += ((idxDataStart.close / idxData6M.close) - 1.0)*2.0
+            result += ((idxDataStart.close / idxData3M.close) - 1.0)*3.0
+            result += ((idxDataStart.close / idxData1M.close) - 1.0)*4.0
+            result /= (1.0 + 2.0 + 3.0 + 4.0)
+
+        return (hasResult, result)
+
 class MultiEvalPrinter(evalresult.TransactionResultPrinter):
 
     def __init__(self):
@@ -277,13 +305,16 @@ class MulitEvalRunner:
 
     def _setupStartEndTime(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2016, 1, 1 )
+        self.endDate = datetime.datetime.today()
 
     def _setupEvaluationPeriod(self):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        self.indexSelector = IndexSelectorRaiseAvg12M()
+        if self.isCall:
+            self.indexSelector = IndexSelectorRaiseAvg12M()
+        else:
+            self.indexSelector = IndexSelectorRaiseAvg12MWeighted()
         #self.indexSelector = IndexSelectorRaise1M()
         #self.indexSelector = IndexSelectorRaise3M()
         #self.indexSelector = IndexSelectorRaise6M()
@@ -388,7 +419,7 @@ class MulitEvalRunner:
                 if currentTransaction2 == None or currentTransaction2.indexSell.date < self.evalStart:
                     currentTransaction2 = self._getNextTransaction( idxList[2][0], self.evalStart, self.evalEnd )
                     if currentTransaction2 != None:
-                        currentTransaction2.indexName = idxList[1][0]
+                        currentTransaction2.indexName = idxList[2][0]
                         currentTransaction2.idxCount = len(idxList)
                         currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
                         self.transactionList2.addTransactionResult(currentTransaction2)
@@ -429,7 +460,7 @@ class MulitEvalRunner:
                 if currentTransaction2 == None or currentTransaction2.indexSell.date < self.evalStart:
                     currentTransaction2 = self._getNextTransaction( idxList[2][0], self.evalStart, self.evalEnd )
                     if currentTransaction2 != None:
-                        currentTransaction2.indexName = idxList[1][0]
+                        currentTransaction2.indexName = idxList[2][0]
                         currentTransaction2.idxCount = len(idxList)
                         currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
                         self.transactionList2.addTransactionResult(currentTransaction2)
@@ -521,6 +552,7 @@ if __name__ == "__main__":
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run()
+
     print ""
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0

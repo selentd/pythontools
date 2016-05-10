@@ -97,7 +97,7 @@ class EvalRunner(object):
 
     def _setupStartEndTime(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime( 2016, 1, 1 )
+        self.endDate = datetime.datetime.today()
 
     def _setupResultCalculator(self):
         if self.runParameters.has_key(EvalRunner.startInvestKey):
