@@ -7,6 +7,8 @@ Created on 27.04.2016
 import datetime
 
 import evalcontinously
+import evalmonthly
+
 import evalrunner
 import evalresult
 import fetchdata
@@ -261,6 +263,20 @@ class MulitEvalRunner:
         else:
             self.isCall = True
 
+    def _calculateEvalEnd_(self, evalStart):
+        evalEnd = evalStart
+        day = evalEnd.day
+        month = evalEnd.month
+        year = evalEnd.year
+
+        if month == 12:
+            month = 1
+            year += 1
+        else:
+            month += 1
+
+        return datetime.datetime( year, month, day )
+
     def _calculateEvalEnd(self, evalStart ):
         evalEnd = evalStart
         if self.periodDays > 0:
@@ -306,6 +322,7 @@ class MulitEvalRunner:
     def _setupStartEndTime(self):
         self.startDate = datetime.datetime( 2000, 1, 1 )
         self.endDate = datetime.datetime.today()
+        #self.endDate = datetime.datetime(2013, 1, 1)
 
     def _setupEvaluationPeriod(self):
         self.periodDays = 1
@@ -517,7 +534,19 @@ class TestEvalContinously3(evalrunner.EvalRunner):
 
     def _createIndexEvaluation(self, indexName):
         #evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, 21, 0.0, self.maxWin, self.maxDays, self.maxLoss, self.maxJump )
-        evaluation = evalcontinously.EvalContinouslyMean3( self.dbName, indexName, self.runParameters )
+        evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, self.runParameters )
+        return evaluation
+
+class TestEvalMonthly(evalrunner.EvalRunner):
+
+    def __init__(self, runParameters):
+        evalrunner.EvalRunner.__init__(self, runParameters)
+
+    def _setupEvalResultPrinter(self):
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+
+    def _createIndexEvaluation(self, indexName):
+        evaluation = evalmonthly.EvalFirstDays( self.dbName, indexName, self.runParameters )
         return evaluation
 
 if __name__ == "__main__":
@@ -527,20 +556,46 @@ if __name__ == "__main__":
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
     runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
-    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 100
+    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 200
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
     runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
     runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
 
+
+    descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                              runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                              runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+    '''
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+
+    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 4
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.04
+
+    testEvaluation = TestEvalMonthly( runParameters )
+    testEvaluation.run( descr )
+
+    multiTestEvaluation = MulitEvalRunner( runParameters )
+    multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
+    multiTestEvaluation.run()
+
+    print ""
+    '''
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+
+    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 100
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
+
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
@@ -568,10 +623,10 @@ if __name__ == "__main__":
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
-
+    '''
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr )
-    '''
+
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run()

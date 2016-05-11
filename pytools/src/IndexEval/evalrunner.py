@@ -60,6 +60,14 @@ class EvalRunner(object):
     idxDistanceKey = "idxDistance"
     isCallKey      = "isCall"
 
+    startDateKey   = "startDateKey"
+    endDateKey     = "endDateKey"
+
+    excludeCheckerKey = "excludeCheckerKey"
+
+    resultPrinterKey      = "resultPrinterKey"
+    transactionPrinterKey = "transactionPrinterKey"
+
     def __init__(self, runParameters = None):
         '''
         Constructor
@@ -96,8 +104,15 @@ class EvalRunner(object):
             self.runParameters = runParameters
 
     def _setupStartEndTime(self):
-        self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime.today()
+        if self.runParameters.has_key(EvalRunner.startDateKey):
+            self.startDate = self.runParameters[EvalRunner.startDateKey]
+        else:
+            self.startDate = datetime.datetime( 2000, 1, 1 )
+
+        if self.runParameters.has_key(EvalRunner.endDateKey):
+            self.endDate = self.runParameters[EvalRunner.endDateKey]
+        else:
+            self.endDate = datetime.datetime.today()
 
     def _setupResultCalculator(self):
         if self.runParameters.has_key(EvalRunner.startInvestKey):
@@ -108,7 +123,7 @@ class EvalRunner(object):
         if self.runParameters.has_key(EvalRunner.maxInvestKey):
             self.maxInvest = self.runParameters[EvalRunner.maxInvestKey]
         else:
-            self.maxInvest = self.startInvest
+            self.maxInvest = 100000.0
 
         if self.runParameters.has_key(EvalRunner.fixedInvestKey):
             self.fixedInvest = self.runParameters[EvalRunner.fixedInvestKey]
@@ -144,13 +159,22 @@ class EvalRunner(object):
                 self.resultCalculatorEuro = evalresult.ResultCalculatorEuroPut(self.startInvest, self.fixedInvest, self.maxInvest)
 
     def _setupResultExcludeChecker(self):
-        self.excludeChecker = evalresult.ExcludeTransaction()
+        if self.runParameters.has_key(EvalRunner.excludeCheckerKey):
+            self.excludeChecker = self.runParameters[EvalRunner.excludeCheckerKey]
+        else:
+            self.excludeChecker = evalresult.ExcludeTransaction()
 
     def _setupTransactionPrinter(self):
-        self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
+        if self.runParameters.has_key(EvalRunner.transactionPrinterKey):
+            self.resultTransactionPrinter = self.runParameters[EvalRunner.transactionPrinterKey]
+        else:
+            self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
 
     def _setupEvalResultPrinter(self):
-        self.evaluationResultPrinter = EvalResultPrinter()
+        if self.runParameters.has_key(EvalRunner.resultPrinterKey):
+            self.evaluationResultPrinter = self.runParameters[EvalRunner.resultPrinterKey]
+        else:
+            self.evaluationResultPrinter = EvalResultPrinter()
 
     def setUp(self):
         self._setupStartEndTime()

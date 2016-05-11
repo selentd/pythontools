@@ -7,33 +7,50 @@ Created on 21.10.2015
 import datetime
 import unittest
 
+import evalbase
 import evalresult
 import fetchdata
 import indexdata
+import transactionchecker
 
-class EvalMonthly:
+class EvalMonthly(evalbase.EvalBase):
     '''
     Check the result, if investment is done only on the last day of the month.
     '''
 
-    def __init__(self, dbName, idxName):
-        self.dbName = dbName
-        self.idxName = idxName
+    def __init__(self, dbName, idxName, runParameters = None):
+        evalbase.EvalBase.__init__(self, dbName, idxName, runParameters)
+
+        self.mean = 0
+        self.startOffset = 0.0
+        self.endOffset = 0.0
+
         self.monthlyHistory= list()
 
-    def loadIndexHistory(self, startDate, endDate = datetime.datetime.now()):
+    def _setupTransactionCheckers(self):
+        if self.runParameters.has_key(evalbase.EvalBase.meanKey):
+            self.mean = self.runParameters[evalbase.EvalBase.meanKey]
+
+        if self.runParameters.has_key(evalbase.EvalBase.startOffsetKey):
+            self.startOffset = self.runParameters[evalbase.EvalBase.startOffsetKey]
+
+        if self.runParameters.has_key(evalbase.EvalBase.endOffsetKey):
+            self.endOffset = self.runParameters[evalbase.EvalBase.endOffsetKey]
+
+        if self.mean != 0:
+            self.startTransactionChecker = transactionchecker.StartTransactionCheckerMean( self.mean, self.startOffset, True)
+            self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, True )
+
+    def _loadIndexHistory(self, startDate, endDate = datetime.datetime.now()):
         self.startDate = startDate
         self.endDate = endDate
 
-        self.monthlyHistory = fetchdata.FetchData( self.idxName ).fetchMonthlyHistory(self.startDate, self.endDate)
-
-    def calculateResult(self):
-        return indexdata.TransactionResultHistory()
+        self.monthlyHistory = fetchdata.FetchData( self.indexName ).fetchMonthlyHistory(self.startDate, self.endDate)
 
 class EvalLastDay(EvalMonthly):
 
-    def __init__(self, dbName, idxName):
-        EvalMonthly.__init__(self, dbName, idxName)
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalMonthly.__init__(self, dbName, idxName, runParameters)
 
     def _investOnLastDay(self, idxHistory):
         transaction = indexdata.TransactionResult()
@@ -45,7 +62,7 @@ class EvalLastDay(EvalMonthly):
 
         return transaction
 
-    def calculateResult(self):
+    def _calculateResult(self):
         transactionList = indexdata.TransactionResultHistory()
 
         for idxHistory in self.monthlyHistory:
@@ -54,13 +71,6 @@ class EvalLastDay(EvalMonthly):
                 transactionList.addTransactionResult(transaction)
 
         return transactionList
-
-class TransactionResultFirstDays(indexdata.TransactionResult):
-
-    def __init__(self):
-        indexdata.TransactionResult.__init__(self)
-
-        self.lastDayResult = 0.0
 
 class ExcludeAvg200LowAndLastDayNegative(evalresult.ExcludeAvg200Low):
 
@@ -87,36 +97,47 @@ class ExcludeAvg200LowAndLastDayPositive(evalresult.ExcludeAvg200Low):
 
 class EvalFirstDays(EvalMonthly):
 
-    def __init__(self, useDays, dbName, idxName):
-        EvalMonthly.__init__(self, dbName, idxName)
-        self.useDays = useDays
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalMonthly.__init__(self, dbName, idxName, runParameters)
 
     def _investOnFirstDays(self, lastHistory, idxHistory):
-        transaction = TransactionResultFirstDays()
+        transaction = indexdata.TransactionResult()
 
-        if (lastHistory.len() > 0) and (idxHistory.len() > self.useDays):
+        if (lastHistory.len() > 1) and (idxHistory.len() > self.maxDays):
             idxBuy = lastHistory.getLast()
-            idxSell = idxHistory.getIndex(self.useDays - 1)
-            transaction.setResult(idxBuy, idxSell)
-            transaction.indexHistory.addIndexData(idxBuy)
-
             transaction.lastDayResult = lastHistory.getLast().close / lastHistory.getIndex( lastHistory.len() - 2).close
             transaction.lastDayResult -= 1.0
 
-            for idx in range(0, self.useDays):
-                transaction.indexHistory.addIndexData(idxHistory.getIndex(idx))
+            if self._checkStartTransaction( idxBuy ):
+                self._startTransaction( idxBuy )
+                transactionHistory = indexdata.IndexHistory()
+                transactionHistory.addIndexData( idxBuy )
+                idxSell = indexdata.IndexData()
 
+                if self.maxDays == 0:
+                    idxRange = idxHistory.len() - 1
+                else:
+                    idxRange = self.maxDays
+
+                for idx in range(0, idxRange):
+                    idxSell = idxHistory.getIndex(idx)
+                    transactionHistory.addIndexData( idxSell )
+                    if self._checkEndTransaction( idxSell, transactionHistory.len() ):
+                        break
+
+                transaction = self._endTransaction( idxBuy, idxSell, transactionHistory )
 
         return transaction
 
-    def calculateResult(self):
+    def _calculateResult(self):
         transactionList = indexdata.TransactionResultHistory()
         lastHistory = None
+
         for idxHistory in self.monthlyHistory:
             if lastHistory:
                 transaction = self._investOnFirstDays(lastHistory, idxHistory)
                 if transaction.isValid():
-                    transactionList.addTransactionResult(transaction)
+                    transactionList.addTransactionResult( transaction )
 
             lastHistory = idxHistory
 
@@ -180,8 +201,7 @@ class EvalFirstDaysStopLoss(EvalFirstDays):
 class EvalMonthlyInvest(EvalMonthly):
 
     def __init__(self, dbName, idxName):
-        EvalMonthly.__init__(self, dbName, idxName)
-
+        EvalMonthly.__init__(self, dbName, idxName, runParameters)
 
     def _investMonthly(self, lastHistory, idxHistory):
         transaction = TransactionResultFirstDays()
