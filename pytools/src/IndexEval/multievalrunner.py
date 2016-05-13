@@ -183,6 +183,62 @@ class IndexSelectorRaiseAvg12MWeighted(IndexSelector):
 
         return (hasResult, result)
 
+class IndexSelectorRsiGrad( IndexSelector ):
+
+    def _calcIndexValue(self, idxName, startDate, endDate):
+        hasResult = False
+        result = 0.0
+
+        fetch = fetchdata.FetchData( idxName )
+        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
+
+        if idxDataStart:
+            #21 34 89 200
+            #13 21 89 200
+            #21 34 89 233
+            #21 34 144 233 !
+            grad1 = idxDataStart.getGradValue( 21 )
+            grad2 = idxDataStart.getGradValue( 55 )
+            grad3 = idxDataStart.getGradValue( 144 )
+            grad4 = idxDataStart.getGradValue( 233 )
+
+            hasResult = (grad1 != 0.0 and grad2 != 0.0 and grad3 != 0.0 and grad4 != 0.0)
+            if hasResult:
+                result = grad1
+                result += grad2
+                result += grad3
+                result += grad4
+                result /= 4.0
+
+        return (hasResult, result)
+
+class IndexSelectorRsiGradWeighted( IndexSelector ):
+
+    def _calcIndexValue(self, idxName, startDate, endDate):
+        hasResult = False
+        result = 0.0
+
+        fetch = fetchdata.FetchData( idxName )
+        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
+
+        if idxDataStart:
+            grad1 = idxDataStart.getGradValue( 13 )
+            grad2 = idxDataStart.getGradValue( 21 )
+            grad3 = idxDataStart.getGradValue( 89 )
+            grad4 = idxDataStart.getGradValue( 200 )
+
+            hasResult = (grad1 != 0.0 and grad2 != 0.0 and grad3 != 0.0 and grad4 != 0.0)
+            if hasResult:
+                result = (grad1 * 4.0)
+                result += (grad2 * 3.0)
+                result += (grad3 * 2.0)
+                result += (grad4 * 1.0)
+                result /= (1.0 + 2.0 + 3.0 + 4.0)
+
+        return (hasResult, result)
+
+
+
 class MultiEvalPrinter(evalresult.TransactionResultPrinter):
 
     def __init__(self):
@@ -329,9 +385,11 @@ class MulitEvalRunner:
 
     def _setupIndexSelector(self):
         if self.isCall:
-            self.indexSelector = IndexSelectorRaiseAvg12M()
+            #self.indexSelector = IndexSelectorRaiseAvg12M()
+            self.indexSelector = IndexSelectorRsiGrad()
         else:
-            self.indexSelector = IndexSelectorRaiseAvg12MWeighted()
+            #self.indexSelector = IndexSelectorRaiseAvg12MWeighted()
+            self.indexSelector = IndexSelectorRsiGradWeighted()
         #self.indexSelector = IndexSelectorRaise1M()
         #self.indexSelector = IndexSelectorRaise3M()
         #self.indexSelector = IndexSelectorRaise6M()
@@ -369,8 +427,8 @@ class MulitEvalRunner:
         self.excludeChecker = evalresult.ExcludeTransaction()
 
     def _setupTransactionPrinter(self):
-        self.resultTransactionPrinter = MultiEvalPrinter()
-        #self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
+        #self.resultTransactionPrinter = MultiEvalPrinter()
+        self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
@@ -587,7 +645,7 @@ if __name__ == "__main__":
 
     print ""
     '''
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 100
     runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
@@ -595,7 +653,7 @@ if __name__ == "__main__":
 
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
@@ -623,6 +681,7 @@ if __name__ == "__main__":
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+
     '''
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr )

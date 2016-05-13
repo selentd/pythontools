@@ -122,10 +122,14 @@ class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
         if self.fixInvest:
             result = self.invest * percCalc
         else:
-            if (self.maxInvest > 0.0) and (self.total > self.maxInvest):
+            newInvest = self.total
+            if newInvest < self.invest:
+                newInvest = self.invest
+
+            if (self.maxInvest > 0.0) and (newInvest > self.maxInvest):
                 result = (self.maxInvest) * percCalc
             else:
-                result = self.total * percCalc
+                result = newInvest * percCalc
 
         self.total += result
         self._checkTotal()
