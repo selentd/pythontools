@@ -14,229 +14,7 @@ import evalresult
 import fetchdata
 import indexdata
 import indexdatabase
-
-class IndexSelector:
-
-    def _calcMonthDiff( self, startDate, monthDiff ):
-        year = startDate.year
-        month = startDate.month
-        day = startDate.day
-        if monthDiff < 12:
-            if ( month - monthDiff ) <= 0:
-                year -= 1
-                month += (12 - monthDiff)
-            else:
-                month -= monthDiff
-        else:
-            year -= 1
-
-        if day > 28:
-            if month == 2:
-                day = 28
-            if day > 30:
-                if month == 4 or month == 6 or month == 9 or month == 11:
-                    day = 30
-
-        return datetime.datetime( year, month, day )
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        pass
-
-    def select(self, startDate, endDate):
-        indexDict = dict()
-
-        for idxName in indexdatabase.IndexDatabase.allIndices:
-            idxResult = self._calcIndexValue(idxName, startDate, endDate )
-            if idxResult[0] == True:
-                indexDict[idxName] = idxResult[1]
-
-        indexList = indexDict.items()
-        indexList = sorted(indexList, key=lambda idx: idx[1], reverse=True)
-
-        return indexList
-
-class IndexSelectorRaise12M(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart != None:
-            diffDate = self._calcMonthDiff(startDate, 12)
-            idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-            if idxData12M != None:
-                hasResult = True
-                result = (idxData12M.close / idxDataStart.close) - 1.0
-
-        return (hasResult, result)
-
-class IndexSelectorRaise1M(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart != None:
-            diffDate = self._calcMonthDiff(startDate, 1)
-            idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-            if idxData12M != None:
-                hasResult = True
-                result = (idxData12M.close / idxDataStart.close) - 1.0
-
-        return (hasResult, result)
-
-class IndexSelectorRaise3M(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart != None:
-            diffDate = self._calcMonthDiff(startDate, 3)
-            idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-            if idxData12M != None:
-                hasResult = True
-                result = (idxData12M.close / idxDataStart.close) - 1.0
-
-        return (hasResult, result)
-
-class IndexSelectorRaise6M(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart != None:
-            diffDate = self._calcMonthDiff(startDate, 6)
-            idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-            if idxData12M != None:
-                hasResult = True
-                result = (idxData12M.close / idxDataStart.close) - 1.0
-
-        return (hasResult, result)
-
-class IndexSelectorRaiseAvg12M(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        diffDate = self._calcMonthDiff(startDate, 12)
-        idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 6 )
-        idxData6M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 3 )
-        idxData3M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 1 )
-        idxData1M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-
-        hasResult = (idxDataStart != None and idxData12M != None and idxData6M != None and idxData3M != None and idxData1M != None)
-        if hasResult:
-            result = (idxDataStart.close / idxData12M.close) - 1.0
-            result += ((idxDataStart.close / idxData6M.close) - 1.0)
-            result += ((idxDataStart.close / idxData3M.close) - 1.0)
-            result += ((idxDataStart.close / idxData1M.close) - 1.0)
-            result /= 4.0
-
-        return (hasResult, result)
-
-class IndexSelectorRaiseAvg12MWeighted(IndexSelector):
-
-    def _calcIndexValue(self, idxName, startDate, endDate ):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        diffDate = self._calcMonthDiff(startDate, 12)
-        idxData12M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 6 )
-        idxData6M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 3 )
-        idxData3M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-        diffDate = self._calcMonthDiff(startDate, 1 )
-        idxData1M = fetch.fetchHistoryValue( diffDate.year, diffDate.month, diffDate.day )
-
-        hasResult = (idxDataStart != None and idxData12M != None and idxData6M != None and idxData3M != None and idxData1M != None)
-        if hasResult:
-            result = (idxDataStart.close / idxData12M.close) - 1.0
-            result += ((idxDataStart.close / idxData6M.close) - 1.0)*2.0
-            result += ((idxDataStart.close / idxData3M.close) - 1.0)*3.0
-            result += ((idxDataStart.close / idxData1M.close) - 1.0)*4.0
-            result /= (1.0 + 2.0 + 3.0 + 4.0)
-
-        return (hasResult, result)
-
-class IndexSelectorRsiGrad( IndexSelector ):
-
-    def _calcIndexValue(self, idxName, startDate, endDate):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart:
-            #21 34 89 200
-            #13 21 89 200
-            #21 34 89 233
-            #21 34 144 233 !
-            grad1 = idxDataStart.getGradValue( 21 )
-            grad2 = idxDataStart.getGradValue( 55 )
-            grad3 = idxDataStart.getGradValue( 144 )
-            grad4 = idxDataStart.getGradValue( 233 )
-
-            hasResult = (grad1 != 0.0 and grad2 != 0.0 and grad3 != 0.0 and grad4 != 0.0)
-            if hasResult:
-                result = grad1
-                result += grad2
-                result += grad3
-                result += grad4
-                result /= 4.0
-
-        return (hasResult, result)
-
-class IndexSelectorRsiGradWeighted( IndexSelector ):
-
-    def _calcIndexValue(self, idxName, startDate, endDate):
-        hasResult = False
-        result = 0.0
-
-        fetch = fetchdata.FetchData( idxName )
-        idxDataStart = fetch.fetchHistoryValue( startDate.year, startDate.month, startDate.day)
-
-        if idxDataStart:
-            grad1 = idxDataStart.getGradValue( 13 )
-            grad2 = idxDataStart.getGradValue( 21 )
-            grad3 = idxDataStart.getGradValue( 89 )
-            grad4 = idxDataStart.getGradValue( 200 )
-
-            hasResult = (grad1 != 0.0 and grad2 != 0.0 and grad3 != 0.0 and grad4 != 0.0)
-            if hasResult:
-                result = (grad1 * 4.0)
-                result += (grad2 * 3.0)
-                result += (grad3 * 2.0)
-                result += (grad4 * 1.0)
-                result /= (1.0 + 2.0 + 3.0 + 4.0)
-
-        return (hasResult, result)
-
+import indexselector
 
 
 class MultiEvalPrinter(evalresult.TransactionResultPrinter):
@@ -294,18 +72,15 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                 self._printResultWinner(transactionResult, result, resultEuro)
 
 
-class MulitEvalRunner:
+class MulitEvalRunner(evalrunner.EvalRunner):
     '''
     classdocs
     '''
 
 
     def __init__(self, runParameters):
-        '''
-        Constructor
-        '''
+        evalrunner.EvalRunner.__init__(self, runParameters)
 
-        self.runParameters = runParameters
         self.periodDays = 0
         self.periodMonths = 0
         self.periodYears = 0
@@ -375,82 +150,17 @@ class MulitEvalRunner:
         return nextTransaction
 
 
-    def _setupStartEndTime(self):
-        self.startDate = datetime.datetime( 2000, 1, 1 )
-        self.endDate = datetime.datetime.today()
-        #self.endDate = datetime.datetime(2013, 1, 1)
-
     def _setupEvaluationPeriod(self):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        if self.isCall:
-            #self.indexSelector = IndexSelectorRaiseAvg12M()
-            self.indexSelector = IndexSelectorRsiGrad()
-        else:
-            #self.indexSelector = IndexSelectorRaiseAvg12MWeighted()
-            self.indexSelector = IndexSelectorRsiGradWeighted()
-        #self.indexSelector = IndexSelectorRaise1M()
-        #self.indexSelector = IndexSelectorRaise3M()
-        #self.indexSelector = IndexSelectorRaise6M()
-        #self.indexSelector = IndexSelectorRaise12M()
+        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth()
 
-    def _setupResultCalculator(self):
-        self.startInvest = self.runParameters[evalrunner.EvalRunner.startInvestKey]
-        self.fixedInvest = self.runParameters[evalrunner.EvalRunner.fixedInvestKey]
-        self.maxInvest = self.runParameters[evalrunner.EvalRunner.maxInvestKey]
-        self.idxDistance = self.runParameters[evalrunner.EvalRunner.idxDistanceKey]
-        if self.isCall:
-            self.resultCalculator = evalresult.ResultCalculator()
-        else:
-            self.resultCalculator = evalresult.ResultCalculatorPut()
+    def setUp(self):
+        evalrunner.EvalRunner.setUp(self)
 
-        if self.runParameters.has_key(evalrunner.EvalRunner.idxDistanceKey):
-            if self.isCall:
-                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( self.runParameters[evalrunner.EvalRunner.idxDistanceKey],
-                                                                                     self.startInvest,
-                                                                                     self.fixedInvest,
-                                                                                     self.maxInvest )
-            else:
-                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeveragePut( self.runParameters[evalrunner.EvalRunner.idxDistanceKey],
-                                                                                        self.startInvest,
-                                                                                        self.fixedInvest,
-                                                                                        self.maxInvest )
-
-        else:
-            if self.isCall:
-                self.resultCalculatorEuro = evalresult.ResultCalculatorEuro(self.startInvest, self.fixedInvest, self.maxInvest)
-            else:
-                self.resultCalculatorEuro = evalresult.ResultCalculatorEuroPut(self.startInvest, self.fixedInvest, self.maxInvest)
-
-    def _setupResultExcludeChecker(self):
-        self.excludeChecker = evalresult.ExcludeTransaction()
-
-    def _setupTransactionPrinter(self):
-        #self.resultTransactionPrinter = MultiEvalPrinter()
-        self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
-
-    def _setupEvalResultPrinter(self):
-        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
-
-    def _createResultEvaluation(self, indexName, descriptionStr):
-        self.resultCalculator.reset()
-        self.resultCalculatorEuro.reset()
-
-        resultEvaluation = evalresult.EvalResult( indexName + " " + descriptionStr, self.startInvest, self.fixedInvest )
-        resultEvaluation.setExcludeChecker( self.excludeChecker )
-        resultEvaluation.setResultCalculator(self.resultCalculator )
-        resultEvaluation.setResultCalculatorEuro(self.resultCalculatorEuro)
-        return resultEvaluation
-
-    def setup(self):
-        self._setupStartEndTime()
         self._setupEvaluationPeriod()
         self._setupIndexSelector()
-        self._setupResultCalculator()
-        self._setupResultExcludeChecker()
-        self._setupTransactionPrinter()
-        self._setupEvalResultPrinter()
 
     def tearDown(self):
         pass
@@ -543,7 +253,7 @@ class MulitEvalRunner:
             self.evalStart = self.evalEnd
             self.evalEnd = self._calculateEvalEnd(self.evalStart)
 
-    def evaluate(self):
+    def runEvaluation(self, descriptionStr):
         if self.isCall == True:
             self._evaluateCall()
         else:
@@ -560,12 +270,6 @@ class MulitEvalRunner:
         resultEvaluation2 = self._createResultEvaluation("3rd", "avg12")
         self.transactionList2.evaluateResult( resultEvaluation2, self.resultTransactionPrinter )
         self.evaluationResultPrinter.printResult("3rd", "avg12", resultEvaluation2)
-
-
-    def run(self):
-        self.setup()
-        self.evaluate()
-        self.tearDown()
 
     def setTransactionListDict(self, transactionLists ):
         self.transactionListDict = transactionLists
