@@ -256,3 +256,20 @@ class EndTransactionCheckerMaxDays(EndTransactionChecker):
     def checkEndTransaction(self, idxData, idxHistoryLen):
         self._updateData(idxData, idxHistoryLen)
         return self._checkMaxHistoryDays(idxHistoryLen)
+
+class EndTransactionCheckerGrad(EndTransactionChecker):
+
+    def __init__(self, grad, minGrad=0.0, isCall=True):
+        self.grad = grad
+        self.minGrad = minGrad
+        self.isCall = isCall
+
+    def checkEndTransaction(self, idxData, idxHistoryLen):
+        endTransaction = False
+        gradValue = idxData.getGradValue( self.grad ) - self.minGrad
+        if gradValue != 0.0:
+            if self.isCall:
+                endTransaction = (gradValue < 0.0)
+            else:
+                endTransaction = (gradValue > 0.0)
+        return endTransaction

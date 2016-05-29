@@ -12,7 +12,6 @@ class MultiResultEvaluation:
     endDateKey   = "endDate"
 
     def __init__(self, runParameters=None):
-
         self.runParameters = runParameters
         self.transactionResultList = list()
 

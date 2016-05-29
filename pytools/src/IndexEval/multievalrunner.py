@@ -149,12 +149,15 @@ class MulitEvalRunner(evalrunner.EvalRunner):
 
         return nextTransaction
 
+    def _setupEvalResultPrinter(self):
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
 
     def _setupEvaluationPeriod(self):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth()
+        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([6,12], True)
+        #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad()
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)
@@ -182,7 +185,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         while self.evalStart < self.endDate:
             idxList = self.indexSelector.select( self.evalStart, self.evalEnd )
 
-            if idxList[0][1] > 0:
+            if (len(idxList) > 0) and (idxList[0][1] > 0):
                 if currentTransaction0 == None or currentTransaction0.indexSell.date < self.evalStart:
                     currentTransaction0 = self._getNextTransaction( idxList[0][0], self.evalStart, self.evalEnd )
                     if currentTransaction0 != None:
@@ -191,7 +194,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
                         self.transactionList0.addTransactionResult(currentTransaction0)
 
-            if idxList[1][1] > 0:
+            if (len(idxList) > 1) and (idxList[1][1] > 0):
                 if currentTransaction1 == None or currentTransaction1.indexSell.date < self.evalStart:
                     currentTransaction1 = self._getNextTransaction( idxList[1][0], self.evalStart, self.evalEnd )
                     if currentTransaction1 != None:
@@ -200,7 +203,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
                         self.transactionList1.addTransactionResult(currentTransaction1)
 
-            if idxList[2][1] > 0:
+            if (len(idxList) >2) and (idxList[2][1] > 0):
                 if currentTransaction2 == None or currentTransaction2.indexSell.date < self.evalStart:
                     currentTransaction2 = self._getNextTransaction( idxList[2][0], self.evalStart, self.evalEnd )
                     if currentTransaction2 != None:
@@ -311,6 +314,18 @@ class TestEvalMonthly(evalrunner.EvalRunner):
         evaluation = evalmonthly.EvalFirstDays( self.dbName, indexName, self.runParameters )
         return evaluation
 
+class TestEvalContinouslyGrad(evalrunner.EvalRunner):
+    def __init__(self, runParameters):
+        evalrunner.EvalRunner.__init__(self, runParameters)
+
+    def _setupEvalResultPrinter(self):
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+
+    def _createIndexEvaluation(self, indexName):
+        #evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, 21, 0.0, self.maxWin, self.maxDays, self.maxLoss, self.maxJump )
+        evaluation = evalcontinously.EvalContinouslyGrad( self.dbName, indexName, self.runParameters )
+        return evaluation
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     runParameters = dict()
@@ -351,25 +366,33 @@ if __name__ == "__main__":
     '''
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
-    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 100
+    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
     runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
 
+
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
+
+    #runParameters[evalcontinously.EvalContinouslyMean.gradKey] = 21
+    #runParameters[evalcontinously.EvalContinouslyMean.minGradKey] = 0.04
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
     testEvaluation = TestEvalContinously3( runParameters )
+    #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr )
 
+
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+    '''
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-    multiTestEvaluation.run()
-
+    multiTestEvaluation.run( descr )
+    '''
     print ""
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
@@ -386,13 +409,13 @@ if __name__ == "__main__":
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    '''
+
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr )
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-    multiTestEvaluation.run()
-    '''
+    multiTestEvaluation.run( descr )
+
     print ""
 

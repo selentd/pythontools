@@ -188,4 +188,13 @@ class EvalContinouslyMean(EvalContinously):
 
         self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, self.isCall )
 
+class EvalContinouslyGrad(EvalContinouslyMean):
 
+    def __init__(self, dbName, idxName, runParameters = None):
+        EvalContinouslyMean.__init__(self, dbName, idxName, runParameters)
+
+    def _setupTransactionCheckers(self):
+        self.startTransactionChecker = transactionchecker.StartTransactionCheckerStrategie(
+                                                                [transactionchecker.StartTransactionCheckerGrad(self.grad, self.minGrad, self.isCall)])
+
+        self.endTransactionChecker = transactionchecker.EndTransactionCheckerGrad( self.grad, -(self.minGrad), self.isCall)

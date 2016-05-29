@@ -143,13 +143,15 @@ class IndexSelectorRSIGrad(IndexSelector):
 
 class IndexSelectorRSIAvgGrad(IndexSelector):
 
-    def __init__(self, gradList = None):
+    def __init__(self, gradList = None, useWeight = False):
         IndexSelector.__init__(self)
 
         if gradList != None:
             self.gradList = gradList
         else:
-            gradList = [21, 39, 89, 200]
+            self.gradList = [21, 34, 89, 200]
+
+        self.useWeight = useWeight
 
     def _calcIndexValue(self, idxName, startDate, endDate ):
         hasResult = False
@@ -165,7 +167,8 @@ class IndexSelectorRSIAvgGrad(IndexSelector):
                 useGradList.append(idxDataStart.getGradValue(useGrad))
 
             for grad in useGradList:
-                hasResult = hasResult and (grad != 0,0)
+                if grad == 0.0:
+                    hasResult = False
 
             if hasResult:
                 if self.useWeight:
