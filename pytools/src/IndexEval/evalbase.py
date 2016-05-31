@@ -16,6 +16,7 @@ class EvalBase:
     maxWinKey  = "maxWin"
     maxLossKey = "maxLoss"
     maxJumpKey = "maxJump"
+    maxHighJumpKey = "maxHighJump"
 
     meanKey        = "mean"
     startOffsetKey = "startOffset"
@@ -32,6 +33,7 @@ class EvalBase:
         self.maxWin  = 0.0
         self.maxLoss = 0.0
         self.maxJump = 0.0
+        self.maxHighJump = 0.0
 
         if runParameters == None:
             self.runParameters = dict()
@@ -45,6 +47,8 @@ class EvalBase:
                 self.maxLoss = self.runParameters[EvalBase.maxLossKey]
             if self.runParameters.has_key(EvalBase.maxJumpKey):
                 self.maxJump = self.runParameters[EvalBase.maxJumpKey]
+            if self.runParameters.has_key(EvalBase.maxHighJumpKey):
+                self.maxHighJump = self.runParameters[EvalBase.maxHighJumpKey]
 
         self.startHistoryChecker = transactionchecker.StartTransactionChecker()
         self.endHistoryChecker = transactionchecker.EndTransactionChecker()
@@ -62,7 +66,7 @@ class EvalBase:
         pass
 
     def _setupPostTransactionCheckers(self):
-        self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin > 0.0)
+        self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin > 0.0 or self.maxHighJump != 0.0)
         if self.hasPostEndTransactionChecker:
             checkerList = list()
             if self.maxDays > 0:
@@ -76,6 +80,9 @@ class EvalBase:
 
             if self.maxWin > 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxWin(self.maxWin))
+
+            if self.maxHighJump != 0:
+                checkerList.append( transactionchecker.EndTransactionCheckerMaxHighJump( self.maxHighJump ))
 
             self.postEndTransactionChecker = transactionchecker.EndTransactionCheckerStrategie( checkerList )
 

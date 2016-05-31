@@ -239,6 +239,31 @@ class EndTransactionCheckerMaxJump(EndTransactionChecker):
         self._updateData(idxData, idxHistoryLen)
         return self._checkMaxJump(idxData)
 
+class EndTransactionCheckerMaxHighJump(EndTransactionChecker):
+
+    def __init__(self, maxHighJumpPerc):
+        EndTransactionChecker.__init__(self)
+        self.maxHighJumpPerc = maxHighJumpPerc
+
+    def _checkMaxHighJump(self, idxData):
+        endTransaction = False
+
+        if self.maxHighJumpPerc > 0.0:
+            result = (float(idxData.close) / float(self.minClose)) - 1.0
+            if result > self.maxHighJumpPerc:
+                endTransaction = True
+
+        if self.maxHighJumpPerc < 0.0:
+            result = (float(idxData.close) / float(self.maxClose)) - 1.0
+            if result < self.maxHighJumpPerc:
+                endTransaction = True
+
+        return endTransaction
+
+    def checkEndTransaction(self, idxData, idxHistoryLen):
+        self._updateData(idxData, idxHistoryLen)
+        return self._checkMaxHighJump(idxData)
+
 class EndTransactionCheckerMaxDays(EndTransactionChecker):
 
     def __init__(self, maxDays):

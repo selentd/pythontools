@@ -156,7 +156,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([6,12], True)
+        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], False)
         #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad()
 
     def setUp(self):
@@ -368,7 +368,8 @@ if __name__ == "__main__":
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
     runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.01
+    #runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = -0.02
 
 
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
@@ -386,24 +387,25 @@ if __name__ == "__main__":
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr )
 
-
-    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
     '''
+    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run( descr )
-    '''
-    print ""
 
+    print ""
+    '''
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 13
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
     runParameters[evalcontinously.EvalContinously.maxLossKey] = 0.0
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = 0.0
+    runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.04
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
@@ -412,6 +414,8 @@ if __name__ == "__main__":
 
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr )
+
+    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)

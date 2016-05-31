@@ -23,6 +23,7 @@ class EvalContinously(evalbase.EvalBase):
     maxWinKey  = "maxWin"
     maxLossKey = "maxLoss"
     maxJumpKey = "maxJump"
+    maxHighJumpKey = "maxHighJump"
 
     def __init__(self, dbName, idxName, runParameters = None):
         evalbase.EvalBase.__init__(self, dbName, idxName, runParameters)
