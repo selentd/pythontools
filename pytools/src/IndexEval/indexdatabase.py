@@ -29,9 +29,13 @@ class IndexDatabase:
     idxSP500       = "sp500"
     idxTecDax      = "tecdax"
 
+    idxGold        = "gold"
+    idxBrent       = "brent"
+
     allIndices = [idxATX, idxCAC, idxDax, idxDowJones, idxEStoxx50,
                   idxFTS100, idxFtseMib, idxHangSeng, idxIbex, idxMDax,
-                  idxNasdaq100, idxNikkei, idxSDax, idxSMI, idxSP500, idxTecDax]
+                  idxNasdaq100, idxNikkei, idxSDax, idxSMI, idxSP500, idxTecDax,
+                  idxGold, idxBrent]
 
     def __init__(self):
         '''
