@@ -256,23 +256,23 @@ class MulitEvalRunner(evalrunner.EvalRunner):
             self.evalStart = self.evalEnd
             self.evalEnd = self._calculateEvalEnd(self.evalStart)
 
-    def runEvaluation(self, descriptionStr):
+    def runEvaluation(self, descriptionStr, indexList = None):
         if self.isCall == True:
             self._evaluateCall()
         else:
             self._evaluatePut()
 
-        resultEvaluation0 = self._createResultEvaluation("best", "avg12")
+        resultEvaluation0 = self._createResultEvaluation("best", descriptionStr)
         self.transactionList0.evaluateResult( resultEvaluation0, self.resultTransactionPrinter )
-        self.evaluationResultPrinter.printResult("best", "avg12", resultEvaluation0)
+        self.evaluationResultPrinter.printResult("best", descriptionStr, resultEvaluation0)
 
-        resultEvaluation1 = self._createResultEvaluation("2nd", "avg12")
+        resultEvaluation1 = self._createResultEvaluation("2nd", descriptionStr)
         self.transactionList1.evaluateResult( resultEvaluation1, self.resultTransactionPrinter )
-        self.evaluationResultPrinter.printResult("2nd", "avg12", resultEvaluation1)
+        self.evaluationResultPrinter.printResult("2nd", descriptionStr, resultEvaluation1)
 
-        resultEvaluation2 = self._createResultEvaluation("3rd", "avg12")
+        resultEvaluation2 = self._createResultEvaluation("3rd", descriptionStr)
         self.transactionList2.evaluateResult( resultEvaluation2, self.resultTransactionPrinter )
-        self.evaluationResultPrinter.printResult("3rd", "avg12", resultEvaluation2)
+        self.evaluationResultPrinter.printResult("3rd", descriptionStr, resultEvaluation2)
 
     def setTransactionListDict(self, transactionLists ):
         self.transactionListDict = transactionLists
@@ -330,6 +330,27 @@ if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     runParameters = dict()
 
+    indexList = [
+                  indexdatabase.IndexDatabase.idxATX,
+                  indexdatabase.IndexDatabase.idxCAC,
+                  indexdatabase.IndexDatabase.idxDax,
+                  indexdatabase.IndexDatabase.idxDowJones,
+                  indexdatabase.IndexDatabase.idxEStoxx50,
+                  indexdatabase.IndexDatabase.idxFTS100,
+                  indexdatabase.IndexDatabase.idxFtseMib,
+                  indexdatabase.IndexDatabase.idxHangSeng,
+                  indexdatabase.IndexDatabase.idxIbex,
+                  indexdatabase.IndexDatabase.idxMDax,
+                  indexdatabase.IndexDatabase.idxNasdaq100,
+                  indexdatabase.IndexDatabase.idxNikkei,
+                  indexdatabase.IndexDatabase.idxSDax,
+                  indexdatabase.IndexDatabase.idxSMI,
+                  indexdatabase.IndexDatabase.idxSP500
+                  #indexdatabase.IndexDatabase.idxTecDax,
+                  #indexdatabase.IndexDatabase.idxGold,
+                  #indexdatabase.IndexDatabase.idxBrent
+                ]
+
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
     runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
@@ -382,12 +403,12 @@ if __name__ == "__main__":
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
-
+    '''
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr )
 
-    '''
+
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
@@ -403,23 +424,26 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = 0.04
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = 0.06
-    runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
 
-    descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
-                                              runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
-                                              runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+    for maxJump in (0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06):
+        maxLoss = 0.01
+        runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+        runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+        runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
 
+        descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                                    runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                                    runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    testEvaluation = TestEvalContinously3( runParameters )
-    testEvaluation.run( descr )
+        testEvaluation = TestEvalContinously3( runParameters )
+        testEvaluation.run( descr, indexList )
 
-    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+        #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
-    multiTestEvaluation = MulitEvalRunner( runParameters )
-    multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-    multiTestEvaluation.run( descr )
+        descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
+        multiTestEvaluation = MulitEvalRunner( runParameters )
+        multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
+        multiTestEvaluation.run( descr )
 
-    print ""
+        print ""
 

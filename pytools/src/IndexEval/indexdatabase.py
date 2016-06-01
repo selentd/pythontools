@@ -11,6 +11,7 @@ class IndexDatabase:
     classdocs
     '''
     dbName = "stockdb"
+    dbIP   = "192.168.81.147"
 
     idxATX         = "atx"
     idxCAC         = "cac"
@@ -37,12 +38,14 @@ class IndexDatabase:
                   idxNasdaq100, idxNikkei, idxSDax, idxSMI, idxSP500, idxTecDax,
                   idxGold, idxBrent]
 
+
+
     def __init__(self):
         '''
         Constructor
         '''
 
-        self._mongoClient = MongoClient()
+        self._mongoClient = MongoClient(self.dbIP)
         self._database = self._mongoClient[self.dbName]
 
     def getIndexCollection(self, idxName):

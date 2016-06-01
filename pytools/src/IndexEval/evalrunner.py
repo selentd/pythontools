@@ -215,9 +215,12 @@ class EvalRunner(object):
         self.transactionListDict[indexName] = transactionList
         self.resultEvaluationDict[indexName] = resultEvaluation
 
-    def runEvaluation(self, descriptionStr):
+    def runEvaluation(self, descriptionStr, indexList = None):
         self.evaluationResultPrinter.printResultHead( descriptionStr )
-        for indexName in self.allIndices:
+        if indexList == None:
+            indexList = self.allIndices
+
+        for indexName in indexList:
             self.evaluateIndex( indexName, descriptionStr )
 
     def runIndex(self, indexName, descriptionStr = "" ):
@@ -226,9 +229,9 @@ class EvalRunner(object):
         self.evaluateIndex( indexName, descriptionStr )
         self.tearDown()
 
-    def run(self, descriptionStr ):
+    def run(self, descriptionStr, indexList = None ):
         self.setUp()
-        self.runEvaluation( descriptionStr )
+        self.runEvaluation( descriptionStr, indexList )
         self.tearDown()
 
 if __name__ == "__main__":
