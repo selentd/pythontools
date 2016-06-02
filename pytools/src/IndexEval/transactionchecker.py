@@ -86,7 +86,7 @@ class EndTransactionChecker:
     def reset(self, idxBuy):
         self.idxBuy = idxBuy
         self.maxClose = idxBuy.close
-        self.maxHigh = idxBuy.high
+        self.maxHigh = idxBuy.close
         self.minClose = idxBuy.close
         self.minLow = idxBuy.close
 
@@ -170,20 +170,41 @@ class EndTransactionCheckerMaxWin(EndTransactionChecker):
     def __init__(self, maxWin):
         EndTransactionChecker.__init__(self)
         self.maxWin = maxWin
+        self.peakWin = 0.0
 
     def _checkMaxWin(self, idxData):
         endTransaction = False
 
-        result = (float(idxData.close) / float(self.idxBuy.close)) - 1.0
-        if self.maxWin > 0.0:
-            if result > self.maxWin:
-                endTransaction = True
+        if idxData.date != self.idxBuy.date:
+            if self.maxWin > 0.0:
+                result = (float(idxData.close) / float(self.idxBuy.close)) - 1.0
 
-        if self.maxWin < 0.0:
-            if result < self.maxWin:
-                endTransaction = True
+                if (self.peakWin - result > self.maxWin):
+                    endTransaction = True
+            else:
+                result = (float(idxData.close) / float(self.idxBuy.close)) -1.0
+
+                if (self.peakWin - result < self.maxWin):
+                    endTransaction = True
+        else:
+            self.peakWin = 0.0
 
         return endTransaction
+
+    def _updateData(self, idxData, idxHistoryLen):
+        EndTransactionChecker._updateData(self, idxData, idxHistoryLen)
+        if self.maxWin > 0:
+            maxResult = (self.maxHigh / self.idxBuy.close) - 1.0
+            if maxResult > self.peakWin:
+                self.peakWin = maxResult
+        else:
+            maxResult = (self.minLow / self.idxBuy.close) - 1.0
+            if maxResult < self.peakWin:
+                self.peakWin = maxResult
+
+    def reset(self, idxBuy):
+        EndTransactionChecker.reset(self, idxBuy)
+        self.peakWin = 0.0
 
     def checkEndTransaction(self, idxData, idxHistoryLen):
         self._updateData(idxData, idxHistoryLen)

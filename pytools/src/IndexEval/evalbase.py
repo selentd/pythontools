@@ -78,7 +78,7 @@ class EvalBase:
             if self.maxJump != 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxJump( self.maxJump ))
 
-            if self.maxWin > 0:
+            if self.maxWin != 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxWin(self.maxWin))
 
             if self.maxHighJump != 0:

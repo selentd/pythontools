@@ -26,7 +26,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printResultLooser(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -41,13 +41,14 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean21)-1.0,
                           (buy / transactionResult.indexBuy.mean89)-1.0,
                           (buy / transactionResult.indexBuy.mean200)-1.0,
-                          float(transactionResult.idxPositive) / float(transactionResult.idxCount) )
+                          float(transactionResult.idxPositive) / float(transactionResult.idxCount),
+                          transactionResult.idxSelect )
 
 
     def _printResultWinner(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -62,7 +63,8 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean21)-1.0,
                           (buy / transactionResult.indexBuy.mean89)-1.0,
                           (buy / transactionResult.indexBuy.mean200)-1.0,
-                          float(transactionResult.idxPositive) / float(transactionResult.idxCount) )
+                          float(transactionResult.idxPositive) / float(transactionResult.idxCount),
+                          transactionResult.idxSelect )
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
         if hasResult:
@@ -156,8 +158,8 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
-        #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad()
+        #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
+        self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21,55,144,233], True)
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)
@@ -192,6 +194,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction0.indexName = idxList[0][0]
                         currentTransaction0.idxCount = len(idxList)
                         currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction0.idxSelect = idxList[0][1]
                         self.transactionList0.addTransactionResult(currentTransaction0)
 
             if (len(idxList) > 1) and (idxList[1][1] > 0):
@@ -201,6 +204,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction1.indexName = idxList[1][0]
                         currentTransaction1.idxCount = len(idxList)
                         currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction1.idxSelect = idxList[1][1]
                         self.transactionList1.addTransactionResult(currentTransaction1)
 
             if (len(idxList) >2) and (idxList[2][1] > 0):
@@ -210,10 +214,12 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction2.indexName = idxList[2][0]
                         currentTransaction2.idxCount = len(idxList)
                         currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction2.idxSelect = idxList[2][1]
                         self.transactionList2.addTransactionResult(currentTransaction2)
 
             self.evalStart = self.evalEnd
             self.evalEnd = self._calculateEvalEnd(self.evalStart)
+
 
     def _evaluatePut(self):
         self.evalStart = self.startDate
@@ -227,31 +233,64 @@ class MulitEvalRunner(evalrunner.EvalRunner):
             idxList.reverse()
 
             if idxList[0][1] < 0:
+            #if len(idxList) > 0:
                 if currentTransaction0 == None or currentTransaction0.indexSell.date < self.evalStart:
                     currentTransaction0 = self._getNextTransaction( idxList[0][0], self.evalStart, self.evalEnd )
                     if currentTransaction0 != None:
                         currentTransaction0.indexName = idxList[0][0]
                         currentTransaction0.idxCount = len(idxList)
                         currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction0.idxSelect = idxList[0][1]
                         self.transactionList0.addTransactionResult(currentTransaction0)
 
             if idxList[1][1] < 0:
+            #if len(idxList) > 1:
                 if currentTransaction1 == None or currentTransaction1.indexSell.date < self.evalStart:
                     currentTransaction1 = self._getNextTransaction( idxList[1][0], self.evalStart, self.evalEnd )
                     if currentTransaction1 != None:
                         currentTransaction1.indexName = idxList[1][0]
                         currentTransaction1.idxCount = len(idxList)
                         currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction1.idxSelect = idxList[1][1]
                         self.transactionList1.addTransactionResult(currentTransaction1)
 
             if idxList[2][1] < 0:
+            #if len(idxList) > 2:
                 if currentTransaction2 == None or currentTransaction2.indexSell.date < self.evalStart:
                     currentTransaction2 = self._getNextTransaction( idxList[2][0], self.evalStart, self.evalEnd )
                     if currentTransaction2 != None:
                         currentTransaction2.indexName = idxList[2][0]
                         currentTransaction2.idxCount = len(idxList)
                         currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction2.idxSelect = idxList[2][1]
                         self.transactionList2.addTransactionResult(currentTransaction2)
+            '''
+
+            if currentTransaction0 == None or currentTransaction0.indexSell.date < self.evalStart:
+                currentTransaction0 = self._getNextTransaction( idxList[0][0], self.evalStart, self.evalEnd )
+                if currentTransaction0 != None:
+                    currentTransaction0.indexName = idxList[0][0]
+                    currentTransaction0.idxCount = len(idxList)
+                    currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                    self.transactionList0.addTransactionResult(currentTransaction0)
+            else:
+                if currentTransaction1 == None or currentTransaction1.indexSell.date < self.evalStart:
+                    currentTransaction1 = self._getNextTransaction(idxList[0][0], self.evalStart, self.evalEnd)
+                    if currentTransaction1 != None:
+                        currentTransaction1.indexName = idxList[0][0]
+                        currentTransaction1.idxCount = len(idxList)
+                        currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                        self.transactionList1.addTransactionResult(currentTransaction1)
+                else:
+                    if currentTransaction2 == None or currentTransaction2.indexSell.date < self.evalStart:
+                        currentTransaction2 = self._getNextTransaction(idxList[0][0], self.evalStart, self.evalEnd)
+                        if currentTransaction2 != None:
+                            currentTransaction2.indexName = idxList[0][0]
+                            currentTransaction2.idxCount = len(idxList)
+                            currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                            self.transactionList1.addTransactionResult(currentTransaction1)
+
+            '''
 
             self.evalStart = self.evalEnd
             self.evalEnd = self._calculateEvalEnd(self.evalStart)
@@ -345,10 +384,10 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxNikkei,
                   indexdatabase.IndexDatabase.idxSDax,
                   indexdatabase.IndexDatabase.idxSMI,
-                  indexdatabase.IndexDatabase.idxSP500
-                  #indexdatabase.IndexDatabase.idxTecDax,
-                  #indexdatabase.IndexDatabase.idxGold,
-                  #indexdatabase.IndexDatabase.idxBrent
+                  indexdatabase.IndexDatabase.idxSP500,
+                  indexdatabase.IndexDatabase.idxTecDax,
+                  indexdatabase.IndexDatabase.idxGold,
+                  indexdatabase.IndexDatabase.idxBrent
                 ]
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
@@ -359,9 +398,9 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 200
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
     runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
     runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
 
@@ -388,6 +427,7 @@ if __name__ == "__main__":
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
+    runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.02
     runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
     #runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = -0.02
@@ -395,7 +435,7 @@ if __name__ == "__main__":
 
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
     #runParameters[evalcontinously.EvalContinouslyMean.gradKey] = 21
     #runParameters[evalcontinously.EvalContinouslyMean.minGradKey] = 0.04
@@ -406,8 +446,7 @@ if __name__ == "__main__":
     '''
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
-    testEvaluation.run( descr )
-
+    testEvaluation.run( descr, indexList )
 
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
@@ -425,25 +464,30 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
 
-    for maxJump in (0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06):
-        maxLoss = 0.01
-        runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
-        runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
-        runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
+    #for maxJump in (0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06):
+    #for maxJump in (0.05, 0.01, 0.00):
+    maxLoss = 0.00
+    maxJump = 0.00
+    runParameters[evalcontinously.EvalContinously.maxWinKey] = -0.02
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+    runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
 
-        descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
-                                                    runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
-                                                    runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+    descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-        testEvaluation = TestEvalContinously3( runParameters )
-        testEvaluation.run( descr, indexList )
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
 
-        #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+    testEvaluation = TestEvalContinously3( runParameters )
+    testEvaluation.run( descr, indexList )
 
-        descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
-        multiTestEvaluation = MulitEvalRunner( runParameters )
-        multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-        multiTestEvaluation.run( descr )
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
-        print ""
+    descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
+    multiTestEvaluation = MulitEvalRunner( runParameters )
+    multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
+    multiTestEvaluation.run( descr )
+
+    print ""
 
