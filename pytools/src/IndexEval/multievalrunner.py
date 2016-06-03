@@ -158,8 +158,8 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
-        self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21,55,144,233], True)
+        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
+        #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21,55,144,233], True)
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)
@@ -385,9 +385,9 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxSDax,
                   indexdatabase.IndexDatabase.idxSMI,
                   indexdatabase.IndexDatabase.idxSP500,
-                  indexdatabase.IndexDatabase.idxTecDax,
-                  indexdatabase.IndexDatabase.idxGold,
-                  indexdatabase.IndexDatabase.idxBrent
+                  indexdatabase.IndexDatabase.idxTecDax
+                  #indexdatabase.IndexDatabase.idxGold
+                  #indexdatabase.IndexDatabase.idxBrent
                 ]
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
@@ -426,10 +426,12 @@ if __name__ == "__main__":
     '''
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
+    maxLoss = 0.0   # -0.01
+    maxJump = 0.0   # -0.02
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.02
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
     #runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = -0.02
 
 
@@ -440,20 +442,21 @@ if __name__ == "__main__":
     #runParameters[evalcontinously.EvalContinouslyMean.gradKey] = 21
     #runParameters[evalcontinously.EvalContinouslyMean.minGradKey] = 0.04
 
-    descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+    descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
-    '''
+
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr, indexList )
 
+    descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run( descr )
-    '''
+
     print ""
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
@@ -477,7 +480,7 @@ if __name__ == "__main__":
                                                 runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                                 runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
+    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
 
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr, indexList )

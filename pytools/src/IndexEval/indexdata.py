@@ -399,8 +399,9 @@ class TransactionResult:
 
         if self.indexHistory.len() > 0:
             for idxData in self.indexHistory.indexHistory:
-                if idxData.low < lowValue:
-                    lowValue = idxData.low
+                if idxData.date != self.indexBuy.date:
+                    if idxData.low < lowValue:
+                        lowValue = idxData.low
 
         return lowValue
 
@@ -411,8 +412,9 @@ class TransactionResult:
 
         if self.indexHistory.len() > 0:
             for idxData in self.indexHistory.indexHistory:
-                if idxData.high > highValue:
-                    highValue = idxData.high
+                if idxData.date != self.indexBuy.date:
+                    if idxData.high > highValue:
+                        highValue = idxData.high
 
         return highValue
 
