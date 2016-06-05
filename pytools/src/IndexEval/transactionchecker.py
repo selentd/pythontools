@@ -150,14 +150,15 @@ class EndTransactionCheckerMaxLoss(EndTransactionChecker):
     def _checkMaxLoss(self, idxData):
         endTransaction = False
 
-        result = (float(idxData.close) / float(self.idxBuy.close)) - 1.0
-        if self.maxLoss > 0.0:
-            if result > self.maxLoss:
-                endTransaction = True
+        if idxData.date != self.idxBuy.date:
+            result = (float(idxData.close) / float(self.idxBuy.close)) - 1.0
+            if self.maxLoss > 0.0:
+                if result > self.maxLoss:
+                    endTransaction = True
 
-        if self.maxLoss < 0.0:
-            if result < self.maxLoss:
-                endTransaction = True
+            if self.maxLoss < 0.0:
+                if result < self.maxLoss:
+                    endTransaction = True
 
         return endTransaction
 

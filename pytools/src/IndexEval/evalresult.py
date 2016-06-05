@@ -56,7 +56,7 @@ class ResultCalculatorPut(ResultCalculator):
         ResultCalculator.__init__(self)
 
     def calcResult(self, buy, sell):
-        return ResultCalculator.calcResult(self, sell, buy)
+        return ResultCalculator.calcResult(self, buy, sell) * (-1.0)
 
 class ResultCalculatorEuro(ResultCalculator):
     '''
@@ -103,7 +103,7 @@ class ResultCalculatorEuroPut(ResultCalculatorEuro):
         ResultCalculatorEuro.__init__(self, invest, fixInvest, maxInvest)
 
     def calcResult(self, buy, sell):
-        return ResultCalculatorEuro.calcResult(self, sell, buy)
+        return ResultCalculatorEuro.calcResult(self, buy, sell) * (-1.0)
 
 class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
     def __init__(self, distance, invest, fixInvest = True, maxInvest = 0.0):
@@ -141,7 +141,7 @@ class ResultCalculatorEuroLeveragePut(ResultCalculatorEuroLeverage):
         ResultCalculatorEuroLeverage.__init__(self, distance, invest, fixInvest, maxInvest)
 
     def calcResult(self, buy, sell):
-        return ResultCalculatorEuroLeverage.calcResult(self, sell, buy)
+        return ResultCalculatorEuroLeverage.calcResult(self, buy, sell) * (-1.0)
 
 class EvalResult:
     '''

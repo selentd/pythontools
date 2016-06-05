@@ -22,11 +22,26 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def __init__(self):
         pass
 
+    def _printTransactionHistoryLooser(self, transactionResult):
+        count = 0
+        for idxData in transactionResult.indexHistory.indexHistory:
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f}',
+                              transactionResult.indexName,
+                              idxData.date,
+                              idxData.date,
+                              idxData.open,
+                              idxData.close,
+                              idxData.low,
+                              idxData.high,
+                              count,
+                              idxData.close - transactionResult.indexBuy.close,
+                              -((idxData.close / transactionResult.indexBuy.close) -1.0))
+            count += 1
 
     def _printResultLooser(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -34,6 +49,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           transactionResult.indexSell.close,
                           transactionResult.getLowValue(),
                           transactionResult.getHighValue(),
+                          transactionResult.indexHistory.len(),
                           resultEuro,
                           result,
                           (buy / transactionResult.indexBuy.mean8)-1.0,
@@ -43,12 +59,29 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
                           transactionResult.idxSelect )
+        self._printTransactionHistoryLooser( transactionResult )
+
+    def _printTransactionHistoryWinner(self, transactionResult):
+        count = 0
+        for idxData in transactionResult.indexHistory.indexHistory:
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f}',
+                              transactionResult.indexName,
+                              idxData.date,
+                              idxData.date,
+                              idxData.open,
+                              idxData.close,
+                              idxData.low,
+                              idxData.high,
+                              count,
+                              idxData.close - transactionResult.indexBuy.close,
+                              -((idxData.close / transactionResult.indexBuy.close) - 1.0))
+            count += 1
 
 
     def _printResultWinner(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -56,6 +89,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           transactionResult.indexSell.close,
                           transactionResult.getLowValue(),
                           transactionResult.getHighValue(),
+                          transactionResult.indexHistory.len(),
                           resultEuro,
                           result,
                           (buy / transactionResult.indexBuy.mean8)-1.0,
@@ -65,6 +99,8 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
                           transactionResult.idxSelect )
+        #self._printTransactionHistoryWinner(transactionResult)
+
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
         if hasResult:
@@ -449,14 +485,14 @@ if __name__ == "__main__":
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr, indexList )
-
+    '''
     descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run( descr )
-
+    '''
     print ""
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
@@ -485,7 +521,7 @@ if __name__ == "__main__":
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr, indexList )
 
-    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
     multiTestEvaluation = MulitEvalRunner( runParameters )
