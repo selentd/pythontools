@@ -220,15 +220,16 @@ class EndTransactionCheckerKnockOut(EndTransactionChecker):
     def _checkKnockOut(self, idxData):
         endTransaction = False
 
-        if self.knockOutPerc > 0.0:
-            result = (float(idxData.high) / float(self.idxBuy.close)) - 1.0
-            if result > self.knockOutPerc:
-                endTransaction = True
+        if idxData.date != self.idxBuy.date:
+            if self.knockOutPerc > 0.0:
+                result = (float(idxData.high) / float(self.idxBuy.close)) - 1.0
+                if result > self.knockOutPerc:
+                    endTransaction = True
 
-        if self.knockOutPerc < 0.0:
-            result = (float(idxData.low) / float(self.idxBuy.close)) - 1.0
-            if result < self.knockOutPerc:
-                endTransaction = True
+            if self.knockOutPerc < 0.0:
+                result = (float(idxData.low) / float(self.idxBuy.close)) - 1.0
+                if result < self.knockOutPerc:
+                    endTransaction = True
 
         return endTransaction
 
@@ -245,15 +246,16 @@ class EndTransactionCheckerMaxJump(EndTransactionChecker):
     def _checkMaxJump(self, idxData):
         endTransaction = False
 
-        if self.maxJumpPerc > 0.0:
-            result = (float(idxData.close) / float(self.minLow)) - 1.0
-            if result > self.maxJumpPerc:
-                endTransaction = True
+        if idxData.date != self.idxBuy.date:
+            if self.maxJumpPerc > 0.0:
+                result = (float(idxData.close) / float(self.minLow)) - 1.0
+                if result > self.maxJumpPerc:
+                    endTransaction = True
 
-        if self.maxJumpPerc < 0.0:
-            result = (float(idxData.close) / float(self.maxHigh)) - 1.0
-            if result < self.maxJumpPerc:
-                endTransaction = True
+            if self.maxJumpPerc < 0.0:
+                result = (float(idxData.close) / float(self.maxHigh)) - 1.0
+                if result < self.maxJumpPerc:
+                    endTransaction = True
 
         return endTransaction
 
@@ -270,15 +272,16 @@ class EndTransactionCheckerMaxHighJump(EndTransactionChecker):
     def _checkMaxHighJump(self, idxData):
         endTransaction = False
 
-        if self.maxHighJumpPerc > 0.0:
-            result = (float(idxData.close) / float(self.minClose)) - 1.0
-            if result > self.maxHighJumpPerc:
-                endTransaction = True
+        if idxData.date != self.idxBuy.date:
+            if self.maxHighJumpPerc > 0.0:
+                result = (float(idxData.close) / float(self.minClose)) - 1.0
+                if result > self.maxHighJumpPerc:
+                    endTransaction = True
 
-        if self.maxHighJumpPerc < 0.0:
-            result = (float(idxData.close) / float(self.maxClose)) - 1.0
-            if result < self.maxHighJumpPerc:
-                endTransaction = True
+            if self.maxHighJumpPerc < 0.0:
+                result = (float(idxData.close) / float(self.maxClose)) - 1.0
+                if result < self.maxHighJumpPerc:
+                    endTransaction = True
 
         return endTransaction
 

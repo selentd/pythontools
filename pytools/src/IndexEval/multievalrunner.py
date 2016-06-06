@@ -25,7 +25,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printTransactionHistoryLooser(self, transactionResult):
         count = 0
         for idxData in transactionResult.indexHistory.indexHistory:
-            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f}',
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                               transactionResult.indexName,
                               idxData.date,
                               idxData.date,
@@ -35,7 +35,10 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                               idxData.high,
                               count,
                               idxData.close - transactionResult.indexBuy.close,
-                              -((idxData.close / transactionResult.indexBuy.close) -1.0))
+                              -((idxData.close / transactionResult.indexBuy.close) -1.0),
+                              (idxData.close / idxData.mean8)-1.0,
+                              (idxData.close / idxData.mean13)-1.0,
+                              (idxData.close / idxData.mean21)-1.0 )
             count += 1
 
     def _printResultLooser(self, transactionResult, result, resultEuro ):
@@ -64,7 +67,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printTransactionHistoryWinner(self, transactionResult):
         count = 0
         for idxData in transactionResult.indexHistory.indexHistory:
-            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f}',
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                               transactionResult.indexName,
                               idxData.date,
                               idxData.date,
@@ -74,7 +77,11 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                               idxData.high,
                               count,
                               idxData.close - transactionResult.indexBuy.close,
-                              -((idxData.close / transactionResult.indexBuy.close) - 1.0))
+                              -((idxData.close / transactionResult.indexBuy.close) - 1.0),
+                              (idxData.close / idxData.mean8)-1.0,
+                              (idxData.close / idxData.mean13)-1.0,
+                              (idxData.close / idxData.mean21)-1.0 )
+
             count += 1
 
 
@@ -99,7 +106,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
                           transactionResult.idxSelect )
-        #self._printTransactionHistoryWinner(transactionResult)
+        self._printTransactionHistoryWinner(transactionResult)
 
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
@@ -507,7 +514,7 @@ if __name__ == "__main__":
     #for maxJump in (0.05, 0.01, 0.00):
     maxLoss = 0.00
     maxJump = 0.00
-    runParameters[evalcontinously.EvalContinously.maxWinKey] = -0.02
+    runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
     runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
@@ -521,7 +528,7 @@ if __name__ == "__main__":
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr, indexList )
 
-    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
     multiTestEvaluation = MulitEvalRunner( runParameters )
