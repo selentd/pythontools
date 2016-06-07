@@ -99,11 +99,15 @@ class EvalContinouslyMean(EvalContinously):
 
         if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
             self.mean2 = self.runParameters[EvalContinouslyMean.mean2Key]
+            if (self.mean2 == 0):
+                self.mean2 = self.mean
         else:
             self.mean2 = self.mean
 
         if self.runParameters.has_key(EvalContinouslyMean.mean3Key):
             self.mean3 = self.runParameters[EvalContinouslyMean.mean3Key]
+            if (self.mean3 == 0):
+                self.mean3 = self.mean
         else:
             self.mean3 = self.mean
 

@@ -408,8 +408,132 @@ class TestEvalContinouslyGrad(evalrunner.EvalRunner):
         evaluation = evalcontinously.EvalContinouslyGrad( self.dbName, indexName, self.runParameters )
         return evaluation
 
+def runPutEvaluations():
+    runParameters   = dict()
+
+    maxTotalResult  = 0.0
+    maxTotalResult2 = 0.0
+    maxTotalResult3 = 0.0
+    maxTotalDescr  = ""
+    maxTotalDescr2 = ""
+    maxTotalDescr3 = ""
+
+    yearStart = 2000
+    period = 9
+    #for meanKey in (144, 200):
+    #for meanKey in (5, 8, 13, 21, 34, 55, 89, 144, 200):
+    for meanKey in (5, 8):
+        #for meanKey2 in (5, 8, 13, 21, 34, 55, 89, 144, 200):
+        for meanKey2 in (5, 8):
+            for meanKey3 in (0, 200):
+
+                maxWin = 0.01
+                maxLoss = 0.00
+                maxJump = 0.00
+                maxHighJump = 0.00
+
+                runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
+                #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
+                runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
+                runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
+                runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
+                #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+
+                runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
+                runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
+                runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
+                runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
+
+                runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
+                runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+                runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+                runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = maxHighJump
+
+
+                descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+
+                runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
+
+                testEvaluation = TestEvalContinously3( runParameters )
+                testEvaluation.run( descr )
+
+                totalCount = 0
+                winCount = 0
+                lossCount = 0
+                winRatio = 0.0
+                maxResultLoss = 0.0
+                maxResultWin = 0.0
+                totalResult = 0.0
+                totalResultEuro = 0.0
+                totalInvestEuro = 0.0
+
+                for entry in testEvaluation.resultEvaluationDict:
+                    resultEvaluationEntry = testEvaluation.resultEvaluationDict[entry]
+                    totalCount += resultEvaluationEntry.getTotalCount()
+                    winCount += resultEvaluationEntry.winCount
+                    lossCount += resultEvaluationEntry.lossCount
+                    winRatio += resultEvaluationEntry.getWinRatio()
+
+                    if (maxResultLoss > resultEvaluationEntry.maxLoss):
+                        maxResultLoss = resultEvaluationEntry.maxLoss
+
+                    if (maxResultWin < resultEvaluationEntry.maxWin):
+                        maxResultWin = resultEvaluationEntry.maxWin
+
+                    totalResult += resultEvaluationEntry.getTotalResult()
+                    totalResultEuro += resultEvaluationEntry.getTotalResultEuro()
+                    totalInvestEuro += resultEvaluationEntry.getTotalInvestEuro()
+
+                print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f} {:>10.2f}',
+                              "Total",
+                              "\"\"",
+                              totalCount,
+                              winCount,
+                              lossCount,
+                              winRatio / len(testEvaluation.resultEvaluationDict),
+                              maxResultLoss,
+                              maxResultWin,
+                              totalResult,
+                              totalResultEuro,
+                              totalInvestEuro,
+                              totalResultEuro - totalInvestEuro )
+
+                if (totalResultEuro - totalInvestEuro) > maxTotalResult:
+                    maxTotalResult3 = maxTotalResult2
+                    maxTotalDescr3 = maxTotalDescr2
+
+                    maxTotalResult2 = maxTotalResult
+                    maxTotalDescr2 = maxTotalDescr
+
+                    maxTotalResult = (totalResultEuro - totalInvestEuro)
+                    maxTotalDescr = descr
+                else:
+                    if (totalResultEuro - totalInvestEuro) > maxTotalResult2:
+                        maxTotalResult3 = maxTotalResult2
+                        maxTotalDescr3 = maxTotalDescr2
+
+                        maxTotalResult2 = (totalResultEuro - totalInvestEuro)
+                        maxTotalDescr2 = descr
+                    else:
+                        if (totalResultEuro - totalInvestEuro) > maxTotalResult3:
+                            maxTotalResult3 = (totalResultEuro - totalInvestEuro)
+                            maxTotalDescr3 = descr
+                #print str.format( '{:10} {:20} {:>10.2f}', "Best", maxTotalDescr, maxTotalResult )
+                #print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
+                #print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
+
+                print ""
+
+    print str.format( '{:10} {:20} {:>10.2f}', "Best", maxTotalDescr, maxTotalResult )
+    print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
+    print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
+    runPutEvaluations()
+    '''
     runParameters = dict()
 
     indexList = [
@@ -429,7 +553,7 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxSMI,
                   indexdatabase.IndexDatabase.idxSP500,
                   indexdatabase.IndexDatabase.idxTecDax
-                  #indexdatabase.IndexDatabase.idxGold
+                  #indexdatabase.IndexDatabase.idxGold,
                   #indexdatabase.IndexDatabase.idxBrent
                 ]
 
@@ -451,7 +575,7 @@ if __name__ == "__main__":
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
-    '''
+
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 4
@@ -466,7 +590,7 @@ if __name__ == "__main__":
     multiTestEvaluation.run()
 
     print ""
-    '''
+
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
     maxLoss = 0.0   # -0.01
@@ -492,41 +616,47 @@ if __name__ == "__main__":
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr, indexList )
-    '''
+
     descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
     multiTestEvaluation.run( descr )
-    '''
+
     print ""
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
+    #for maxWin in (0.00, -0.01, -0.02, -0.03, -0.04, -0.05, -0.06):
+    #for meanKey1 in (8,13, 21, 34, 55, 89, 144):
+    meanKey = 5
+    meanKey1 = 8
+    maxLoss = 0.05
+    maxJump = 0.00
+    maxWin = 0.00
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 13
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey1
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
-
 
     #for maxJump in (0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06):
     #for maxJump in (0.05, 0.01, 0.00):
-    maxLoss = 0.00
-    maxJump = 0.00
-    runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
+        #maxLoss = 0.00
+    runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
     runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = 0.0
 
     descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
-                                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
-                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+                                            runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                            runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
     runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
 
     testEvaluation = TestEvalContinously3( runParameters )
     testEvaluation.run( descr, indexList )
+    #print ""
 
     #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
@@ -536,4 +666,4 @@ if __name__ == "__main__":
     multiTestEvaluation.run( descr )
 
     print ""
-
+    '''

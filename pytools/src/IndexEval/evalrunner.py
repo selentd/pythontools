@@ -191,8 +191,9 @@ class EvalRunner(object):
         pass
 
     def _createResultEvaluation(self, indexName, descriptionStr):
-        self.resultCalculator.reset()
-        self.resultCalculatorEuro.reset()
+        #self.resultCalculator.reset()
+        #self.resultCalculatorEuro.reset()
+        self._setupResultCalculator()
 
         resultEvaluation = evalresult.EvalResult( indexName + " " + descriptionStr, self.startInvest, self.fixedInvest )
         resultEvaluation.setExcludeChecker( self.excludeChecker )
