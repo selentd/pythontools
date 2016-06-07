@@ -378,6 +378,7 @@ class TestEvalContinously3(evalrunner.EvalRunner):
 
     def _setupEvalResultPrinter(self):
         self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        #self.evaluationResultPrinter = evalrunner.EvalResultPrinter()
 
     def _createIndexEvaluation(self, indexName):
         #evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, 21, 0.0, self.maxWin, self.maxDays, self.maxLoss, self.maxJump )
@@ -427,7 +428,7 @@ def runPutEvaluations():
         for meanKey2 in (5, 8):
             for meanKey3 in (0, 200):
 
-                maxWin = 0.01
+                maxWin = 0.0
                 maxLoss = 0.00
                 maxJump = 0.00
                 maxHighJump = 0.00
@@ -437,9 +438,9 @@ def runPutEvaluations():
                 runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
                 runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
                 runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-                #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+                runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
-                runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
+                runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
                 runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
                 runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
                 runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
@@ -458,6 +459,7 @@ def runPutEvaluations():
 
                 testEvaluation = TestEvalContinously3( runParameters )
                 testEvaluation.run( descr )
+
 
                 totalCount = 0
                 winCount = 0
@@ -488,7 +490,7 @@ def runPutEvaluations():
 
                 print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f} {:>10.2f}',
                               "Total",
-                              "\"\"",
+                              descr,
                               totalCount,
                               winCount,
                               lossCount,
@@ -524,8 +526,16 @@ def runPutEvaluations():
                 #print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
                 #print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
 
-                print ""
+                #print ""
 
+                descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
+
+                multiTestEvaluation = MulitEvalRunner( runParameters )
+                multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
+                multiTestEvaluation.run( descr )
+
+
+    print ""
     print str.format( '{:10} {:20} {:>10.2f}', "Best", maxTotalDescr, maxTotalResult )
     print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
     print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
