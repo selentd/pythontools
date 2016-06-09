@@ -62,7 +62,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
                           transactionResult.idxSelect )
-        self._printTransactionHistoryLooser( transactionResult )
+        #self._printTransactionHistoryLooser( transactionResult )
 
     def _printTransactionHistoryWinner(self, transactionResult):
         count = 0
@@ -106,7 +106,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
                           transactionResult.idxSelect )
-        self._printTransactionHistoryWinner(transactionResult)
+        #self._printTransactionHistoryWinner(transactionResult)
 
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
@@ -201,8 +201,8 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
-        #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21,55,144,233], True)
+        #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
+        self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([13,21,89,233], True)
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)
@@ -429,7 +429,7 @@ def runPutEvaluations():
             for meanKey3 in (0, 200):
 
                 maxWin = 0.0
-                maxLoss = 0.00
+                maxLoss = 0.00001
                 maxJump = 0.00
                 maxHighJump = 0.00
 
@@ -438,7 +438,7 @@ def runPutEvaluations():
                 runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
                 runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
                 runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-                runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+                #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
                 runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
                 runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
@@ -533,6 +533,7 @@ def runPutEvaluations():
                 multiTestEvaluation = MulitEvalRunner( runParameters )
                 multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
                 multiTestEvaluation.run( descr )
+                print ""
 
 
     print ""

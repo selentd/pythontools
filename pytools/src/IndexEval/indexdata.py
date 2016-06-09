@@ -418,6 +418,24 @@ class TransactionResult:
 
         return highValue
 
+    def getLowClose(self):
+        lowValue = self.indexBuy.close
+        if self.indexHistory.len() > 0:
+            for idxData in self.indexHistory.indexHistory:
+                if idxData.close < lowValue:
+                    lowValue = idxData.close
+
+        return lowValue
+
+    def getHighClose(self):
+        highValue = self.indexBuy.close
+        if self.indexHistory.len() > 0:
+            for idxData in self.indexHistory.indexHistory:
+                if idxData.close > highValue:
+                    highValue = idxData.close
+
+        return highValue
+
     def isValid(self):
         return (self.indexBuy.close) > 0 and (self.indexSell.close > 0)
 
@@ -433,7 +451,7 @@ class TransactionResultHistory:
     def addTransactionResult(self, result):
         self.resultHistory.append(result)
 
-    def evaluateResult(self, evaluationResult, printTransaction = None):
+    def evaluateResult(self, evaluationResult, printTransactionResult = None):
         for transactionResult in self.resultHistory:
-            evaluationResult.evaluate( transactionResult, printTransaction )
+            evaluationResult.evaluate( transactionResult, printTransactionResult )
 
