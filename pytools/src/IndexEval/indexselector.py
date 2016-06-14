@@ -187,3 +187,38 @@ class IndexSelectorRSIAvgGrad(IndexSelector):
                     result /= len(useGradList)
 
         return (hasResult, result)
+
+class IndexSelectorIdxData(IndexSelector):
+
+    class TransactionDay():
+
+        def __init__(self, transactionDate):
+            self.transactionDate = transactionDate
+            self.indexList = list()
+
+    def __init__(self):
+        IndexSelector.__init__(self)
+        self.allTransactions = list()
+
+    def setupIdxData(self, transactionListDict, startDate, endDate):
+
+        currentDate = startDate
+        while currentDate < endDate:
+            transactionDay = IndexSelectorIdxData.TransactionDay( currentDate )
+
+            for idxName in transactionListDict:
+                for transaction in transactionListDict[idxName].resultHistory:
+                    if transaction.indexBuy.date == currentDate:
+                        transaction.indexName = idxName
+                        transactionDay.indexList.append( transaction )
+                        break
+                    if transaction.indexBuy.date > currentDate:
+                        break
+
+            if len(transactionDay.indexList) > 0:
+                self.allTransactions.append(transactionDay)
+
+            currentDate += datetime.timedelta( 1 )
+
+
+

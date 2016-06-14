@@ -122,6 +122,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
     classdocs
     '''
 
+    indexSelectorKey = "indexSelector"
 
     def __init__(self, runParameters):
         evalrunner.EvalRunner.__init__(self, runParameters)
@@ -201,8 +202,10 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
-        self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([13,21,89,233], True)
+        if self.runParameters.has_key(self.indexSelectorKey):
+            self.indexSelector = self.runParameters[self.indexSelectorKey]
+        else:
+            self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)

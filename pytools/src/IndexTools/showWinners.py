@@ -10,6 +10,7 @@ import evalcontinously
 import evalresult
 import evalrunner
 import indexdatabase
+import indexselector
 
 import test_evalcontinously
 
@@ -40,6 +41,12 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
         else:
             print str.format( '{:10} no result', transactionResult.indexName )
 
+
+def showTransactions( transactionListDict ):
+    idxSelector = indexselector.IndexSelectorIdxData()
+
+    idxSelector.setupIdxData(transactionListDict, datetime.datetime( 2000, 1, 1), datetime.datetime.now())
+
 def showWinners():
     runParameters = dict()
 
@@ -48,9 +55,9 @@ def showWinners():
     meanKey3 = 0
 
     maxWin = 0.0
-    maxLoss = 0.0001
-    maxJump = 0.00
-    maxHighJump = 0.00
+    maxLoss = 0.0
+    maxJump = 0.0
+    maxHighJump = 0.0
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
     #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
@@ -75,10 +82,12 @@ def showWinners():
                                     runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
     runParameters[evalrunner.EvalRunner.resultPrinterKey] = evalrunner.EvalResultPrinterSimple()
-    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = DetailedTransactionPrinter()
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = DetailedTransactionPrinter()
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     evalBuys.run( descr )
+
+    showTransactions( evalBuys.transactionListDict )
 
 if __name__ == '__main__':
     showWinners()
