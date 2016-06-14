@@ -122,11 +122,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
     classdocs
     '''
 
-<<<<<<< HEAD
-    indexSelectorKey = "IndexSelector"
-=======
     indexSelectorKey = "indexSelector"
->>>>>>> branch 'devtrial' of https://github.com/selentd/pythontools
 
     def __init__(self, runParameters):
         evalrunner.EvalRunner.__init__(self, runParameters)
