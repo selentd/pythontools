@@ -15,11 +15,11 @@ def requestBuy():
     for idxName in indexDB.allIndices:
         fetch = fetchdata.FetchData( idxName )
 
-        idxData0 = fetch.fetchLastDayOfMonth( 2016, 4)
-        idxData1 = fetch.fetchLastDayOfMonth( 2016, 3)
-        idxData2 = fetch.fetchLastDayOfMonth( 2016, 1)
-        idxData3 = fetch.fetchLastDayOfMonth( 2015, 10)
-        idxData4 = fetch.fetchLastDayOfMonth( 2015, 4)
+        idxData0 = fetch.fetchLastDayOfMonth( 2016, 5)
+        idxData1 = fetch.fetchLastDayOfMonth( 2016, 4)
+        idxData2 = fetch.fetchLastDayOfMonth( 2016, 2)
+        idxData3 = fetch.fetchLastDayOfMonth( 2015, 11)
+        idxData4 = fetch.fetchLastDayOfMonth( 2015, 5)
         print str.format( '{:10} {:> 6.3f} {:> 6.3f} {:> 6.3f} {:4}-{:02}-{:02} {:>10} {:4}-{:02}-{:02} {:>10} {:4}-{:02}-{:02} {:>10} {:4}-{:02}-{:02} {:>10} {:4}-{:02}-{:02} {:>10}',
                           idxName,
                           ((idxData0.close / idxData0.mean13)-1.0), ((idxData0.close / idxData0.mean21)-1.0), ((idxData0.close / idxData0.mean200)-1.0),

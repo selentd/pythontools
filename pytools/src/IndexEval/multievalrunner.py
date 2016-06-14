@@ -122,6 +122,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
     classdocs
     '''
 
+    indexSelectorKey = "IndexSelector"
 
     def __init__(self, runParameters):
         evalrunner.EvalRunner.__init__(self, runParameters)
@@ -201,8 +202,10 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         self.periodDays = 1
 
     def _setupIndexSelector(self):
-        #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
-        self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([13,21,89,233], True)
+        if self.runParameters.has_key(self.indexSelectorKey):
+            self.indexSelector = self.runParameters[self.indexSelectorKey]
+        else:
+            self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
 
     def setUp(self):
         evalrunner.EvalRunner.setUp(self)
@@ -377,8 +380,8 @@ class TestEvalContinously3(evalrunner.EvalRunner):
         evalrunner.EvalRunner.__init__(self, runParameters)
 
     def _setupEvalResultPrinter(self):
-        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
-        #self.evaluationResultPrinter = evalrunner.EvalResultPrinter()
+        #self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinter()
 
     def _createIndexEvaluation(self, indexName):
         #evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, 21, 0.0, self.maxWin, self.maxDays, self.maxLoss, self.maxJump )
@@ -391,7 +394,9 @@ class TestEvalMonthly(evalrunner.EvalRunner):
         evalrunner.EvalRunner.__init__(self, runParameters)
 
     def _setupEvalResultPrinter(self):
-        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        #self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinter()
+
 
     def _createIndexEvaluation(self, indexName):
         evaluation = evalmonthly.EvalFirstDays( self.dbName, indexName, self.runParameters )
@@ -402,144 +407,194 @@ class TestEvalContinouslyGrad(evalrunner.EvalRunner):
         evalrunner.EvalRunner.__init__(self, runParameters)
 
     def _setupEvalResultPrinter(self):
-        self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        #self.evaluationResultPrinter = evalrunner.EvalResultPrinterSimple()
+        self.evaluationResultPrinter = evalrunner.EvalResultPrinter()
 
     def _createIndexEvaluation(self, indexName):
         #evaluation = evalcontinously.EvalContinouslyMean( self.dbName, indexName, 21, 0.0, self.maxWin, self.maxDays, self.maxLoss, self.maxJump )
         evaluation = evalcontinously.EvalContinouslyGrad( self.dbName, indexName, self.runParameters )
         return evaluation
 
+class TotalEvaluationResult:
+
+    def __init__(self):
+        self.maxTotalResult1 = 0.0
+        self.maxTotalDescr1 = ""
+        self.maxTotalResult2 = 0.0
+        self.maxTotalDescr2 = ""
+        self.maxTotalResult3 = 0.0
+        self.maxTotalDescr3 = 0.0
+
+    def updateTotalResult(self, resultEvaluationDict, descr):
+        totalCount = 0
+        winCount = 0
+        lossCount = 0
+        winRatio = 0.0
+        maxResultLoss = 0.0
+        maxResultWin = 0.0
+        totalResult = 0.0
+        totalResultEuro = 0.0
+        totalInvestEuro = 0.0
+
+        for entry in resultEvaluationDict:
+            resultEvaluationEntry = resultEvaluationDict[entry]
+            totalCount += resultEvaluationEntry.getTotalCount()
+            winCount += resultEvaluationEntry.winCount
+            lossCount += resultEvaluationEntry.lossCount
+            winRatio += resultEvaluationEntry.getWinRatio()
+
+            if (maxResultLoss > resultEvaluationEntry.maxLoss):
+                maxResultLoss = resultEvaluationEntry.maxLoss
+
+            if (maxResultWin < resultEvaluationEntry.maxWin):
+                maxResultWin = resultEvaluationEntry.maxWin
+
+            totalResult += resultEvaluationEntry.getTotalResult()
+            totalResultEuro += resultEvaluationEntry.getTotalResultEuro()
+            totalInvestEuro += resultEvaluationEntry.getTotalInvestEuro()
+
+        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f} {:>10.2f}',
+                      "Total",
+                      descr,
+                      totalCount,
+                      winCount,
+                      lossCount,
+                      winRatio / len(resultEvaluationDict),
+                      maxResultLoss,
+                      maxResultWin,
+                      totalResult,
+                      totalResultEuro,
+                      totalInvestEuro,
+                      totalResultEuro - totalInvestEuro )
+
+        if (totalResultEuro - totalInvestEuro) > self.maxTotalResult1:
+            self.maxTotalResult3 = self.maxTotalResult2
+            self.maxTotalDescr3 = self.maxTotalDescr2
+
+            self.maxTotalResult2 = self.maxTotalResult1
+            self.maxTotalDescr2 = self.maxTotalDescr1
+
+            self.maxTotalResult1 = (totalResultEuro - totalInvestEuro)
+            self.maxTotalDescr1 = descr
+        else:
+            if (totalResultEuro - totalInvestEuro) > self.maxTotalResult2:
+                self.maxTotalResult3 = self.maxTotalResult2
+                self.maxTotalDescr3 = self.maxTotalDescr2
+
+                self.maxTotalResult2 = (totalResultEuro - totalInvestEuro)
+                self.maxTotalDescr2 = descr
+            else:
+                if (totalResultEuro - totalInvestEuro) > self.maxTotalResult3:
+                    self.maxTotalResult3 = (totalResultEuro - totalInvestEuro)
+                    self.maxTotalDescr3 = descr
+
+        #print str.format( '{:10} {:20} {:>10.2f}', "Best", self.maxTotalDescr1, self.maxTotalResult1 )
+        #print str.format( '{:10} {:20} {:>10.2f}', "2nd", self.maxTotalDescr2, self.maxTotalResult2 )
+        #print str.format( '{:10} {:20} {:>10.2f}', "3rd", self.maxTotalDescr3, self.maxTotalResult3 )
+
+        #print ""
+
 def runPutEvaluations():
     runParameters   = dict()
-
-    maxTotalResult  = 0.0
-    maxTotalResult2 = 0.0
-    maxTotalResult3 = 0.0
-    maxTotalDescr  = ""
-    maxTotalDescr2 = ""
-    maxTotalDescr3 = ""
+    totalEvaluationResult = TotalEvaluationResult()
 
     yearStart = 2000
     period = 9
-    #for meanKey in (144, 200):
-    #for meanKey in (5, 8, 13, 21, 34, 55, 89, 144, 200):
-    for meanKey in (5, 8):
-        #for meanKey2 in (5, 8, 13, 21, 34, 55, 89, 144, 200):
-        for meanKey2 in (5, 8):
-            for meanKey3 in (0, 200):
 
-                maxWin = 0.0
-                maxLoss = 0.00001
-                maxJump = 0.00
-                maxHighJump = 0.00
+    maxWin = 0.0
+    maxLoss = 0.0001
+    maxJump = 0.00
+    maxHighJump = 0.00
 
-                runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
-                #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
-                runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
-                runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
-                runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-                #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
+    #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
+    runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
+    runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
+    runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
+    #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
-                runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
+    runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
+
+    runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+    runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = maxHighJump
+
+    meanKey2 = 0
+    meanKey3 = 0
+
+    meanList = (5, 8, 13, 21, 34, 38, 50, 55, 89, 100, 144, 200, 233)
+
+    for meanKey in meanList:
+        for endMean in meanList:
+            if endMean == meanKey:
                 runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
                 runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
                 runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
+                runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = endMean
 
-                runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
-                runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
-                runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
-                runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = maxHighJump
-
-
-                descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                descr = str.format("\"Mean {:3} {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                                 runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
-                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.endMeanKey])
 
                 runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
 
                 testEvaluation = TestEvalContinously3( runParameters )
                 testEvaluation.run( descr )
+                totalEvaluationResult.updateTotalResult( testEvaluation.resultEvaluationDict, descr)
+
+    for meanKey in meanList:
+        for meanKey2 in meanList:
+            if meanKey2 > meanKey:
+                for endMean in meanList:
+                    if endMean == meanKey or endMean == meanKey2:
+                        runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
+                        runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
+                        runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
+                        runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = endMean
+
+                        descr = str.format("\"Mean {:3} {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.endMeanKey])
+
+                        runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
+
+                        testEvaluation = TestEvalContinously3( runParameters )
+                        testEvaluation.run( descr )
+                        totalEvaluationResult.updateTotalResult( testEvaluation.resultEvaluationDict, descr)
+
+    for meanKey in meanList:
+        for meanKey2 in meanList:
+            if meanKey2 > meanKey:
+                for meanKey3 in meanList:
+                    if (meanKey3 > meanKey2):
+                        for endMean in meanList:
+                            if endMean == meanKey or endMean == meanKey2 or endMean == meanKey3:
+                                runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
+                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
+                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
+                                runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = endMean
+
+                                descr = str.format("\"Mean {:3} {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.mean3Key],
+                                                runParameters[evalcontinously.EvalContinouslyMean.endMeanKey])
+
+                                runParameters[evalrunner.EvalRunner.transactionPrinterKey] = None
+
+                                testEvaluation = TestEvalContinously3( runParameters )
+                                testEvaluation.run( descr )
+                                totalEvaluationResult.updateTotalResult( testEvaluation.resultEvaluationDict, descr)
 
 
-                totalCount = 0
-                winCount = 0
-                lossCount = 0
-                winRatio = 0.0
-                maxResultLoss = 0.0
-                maxResultWin = 0.0
-                totalResult = 0.0
-                totalResultEuro = 0.0
-                totalInvestEuro = 0.0
-
-                for entry in testEvaluation.resultEvaluationDict:
-                    resultEvaluationEntry = testEvaluation.resultEvaluationDict[entry]
-                    totalCount += resultEvaluationEntry.getTotalCount()
-                    winCount += resultEvaluationEntry.winCount
-                    lossCount += resultEvaluationEntry.lossCount
-                    winRatio += resultEvaluationEntry.getWinRatio()
-
-                    if (maxResultLoss > resultEvaluationEntry.maxLoss):
-                        maxResultLoss = resultEvaluationEntry.maxLoss
-
-                    if (maxResultWin < resultEvaluationEntry.maxWin):
-                        maxResultWin = resultEvaluationEntry.maxWin
-
-                    totalResult += resultEvaluationEntry.getTotalResult()
-                    totalResultEuro += resultEvaluationEntry.getTotalResultEuro()
-                    totalInvestEuro += resultEvaluationEntry.getTotalInvestEuro()
-
-                print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f} {:>10.2f}',
-                              "Total",
-                              descr,
-                              totalCount,
-                              winCount,
-                              lossCount,
-                              winRatio / len(testEvaluation.resultEvaluationDict),
-                              maxResultLoss,
-                              maxResultWin,
-                              totalResult,
-                              totalResultEuro,
-                              totalInvestEuro,
-                              totalResultEuro - totalInvestEuro )
-
-                if (totalResultEuro - totalInvestEuro) > maxTotalResult:
-                    maxTotalResult3 = maxTotalResult2
-                    maxTotalDescr3 = maxTotalDescr2
-
-                    maxTotalResult2 = maxTotalResult
-                    maxTotalDescr2 = maxTotalDescr
-
-                    maxTotalResult = (totalResultEuro - totalInvestEuro)
-                    maxTotalDescr = descr
-                else:
-                    if (totalResultEuro - totalInvestEuro) > maxTotalResult2:
-                        maxTotalResult3 = maxTotalResult2
-                        maxTotalDescr3 = maxTotalDescr2
-
-                        maxTotalResult2 = (totalResultEuro - totalInvestEuro)
-                        maxTotalDescr2 = descr
-                    else:
-                        if (totalResultEuro - totalInvestEuro) > maxTotalResult3:
-                            maxTotalResult3 = (totalResultEuro - totalInvestEuro)
-                            maxTotalDescr3 = descr
-                #print str.format( '{:10} {:20} {:>10.2f}', "Best", maxTotalDescr, maxTotalResult )
-                #print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
-                #print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
-
-                #print ""
-
-                descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
-
-                multiTestEvaluation = MulitEvalRunner( runParameters )
-                multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-                multiTestEvaluation.run( descr )
-                print ""
 
 
     print ""
-    print str.format( '{:10} {:20} {:>10.2f}', "Best", maxTotalDescr, maxTotalResult )
-    print str.format( '{:10} {:20} {:>10.2f}', "2nd", maxTotalDescr2, maxTotalResult2 )
-    print str.format( '{:10} {:20} {:>10.2f}', "3rd", maxTotalDescr3, maxTotalResult3 )
+    print str.format( '{:10} {:20} {:>10.2f}', "Best", totalEvaluationResult.maxTotalDescr1, totalEvaluationResult.maxTotalResult1 )
+    print str.format( '{:10} {:20} {:>10.2f}', "2nd", totalEvaluationResult.maxTotalDescr2, totalEvaluationResult.maxTotalResult2 )
+    print str.format( '{:10} {:20} {:>10.2f}', "3rd", totalEvaluationResult.maxTotalDescr3, totalEvaluationResult.maxTotalResult3 )
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

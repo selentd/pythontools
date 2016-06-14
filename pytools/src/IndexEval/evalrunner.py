@@ -22,7 +22,7 @@ class EvalResultPrinter:
 class EvalResultPrinterSimple:
 
     def printResultHead(self, descriptionStr ):
-        print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6} {:>6} {:>6} {:>6} {:>10} {:>10}',
+        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>10} {:>10}',
                           "index",
                           "descr",
                           "tot",
@@ -36,7 +36,7 @@ class EvalResultPrinterSimple:
                           "invest-EUR" )
 
     def printResult(self, indexName, descriptionStr, resultEvaluation):
-        print str.format( '{:10} {:20} {:>4} {:>4} {:>4} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}',
+        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}',
                           indexName,
                           descriptionStr,
                           resultEvaluation.getTotalCount(),

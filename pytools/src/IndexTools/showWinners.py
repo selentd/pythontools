@@ -10,6 +10,7 @@ import evalcontinously
 import evalresult
 import evalrunner
 import indexdatabase
+import indexselector
 
 import test_evalcontinously
 
@@ -75,7 +76,7 @@ def showWinners():
                                     runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
     runParameters[evalrunner.EvalRunner.resultPrinterKey] = evalrunner.EvalResultPrinterSimple()
-    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = DetailedTransactionPrinter()
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = DetailedTransactionPrinter()
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     evalBuys.run( descr )

@@ -71,6 +71,7 @@ class EvalContinouslyMean(EvalContinously):
     mean3Key        = "mean3"
     mean4Key        = "mean4"
     mean5Key        = "mean5"
+    endMeanKey      = "endMean"
     gradKey         = "grad"
     grad2Key        = "grad2"
     grad3Key        = "grad3"
@@ -99,17 +100,18 @@ class EvalContinouslyMean(EvalContinously):
 
         if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
             self.mean2 = self.runParameters[EvalContinouslyMean.mean2Key]
-            if (self.mean2 == 0):
-                self.mean2 = self.mean
         else:
-            self.mean2 = self.mean
+            self.mean2 = 0
 
         if self.runParameters.has_key(EvalContinouslyMean.mean3Key):
             self.mean3 = self.runParameters[EvalContinouslyMean.mean3Key]
-            if (self.mean3 == 0):
-                self.mean3 = self.mean
         else:
-            self.mean3 = self.mean
+            self.mean3 = 0
+
+        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey):
+            self.endMean = self.runParameters[EvalContinouslyMean.endMeanKey]
+        else:
+            self.endMean = self.mean
 
         if self.runParameters.has_key( EvalContinouslyMean.gradKey ):
             self.grad = self.runParameters[EvalContinouslyMean.gradKey]
@@ -185,13 +187,13 @@ class EvalContinouslyMean(EvalContinously):
         self.startTransactionChecker = transactionchecker.StartTransactionCheckerStrategie(
                                                                 [transactionchecker.StartTransactionCheckerMean(self.mean, self.startOffset, self.isCall)] )
 
-        if self.mean2 != self.mean:
+        if self.mean2 != 0:
             self.startTransactionChecker.addTransactionChecker(transactionchecker.StartTransactionCheckerMean(self.mean2, self.startOffset2, self.isCall))
 
-        if self.mean3 != self.mean:
+        if self.mean3 != 0:
             self.startTransactionChecker.addTransactionChecker(transactionchecker.StartTransactionCheckerMean(self.mean3, self.startOffset3, self.isCall))
 
-        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.mean, self.endOffset, self.isCall )
+        self.endTransactionChecker = transactionchecker.EndTransactionCheckerMean( self.endMean, self.endOffset, self.isCall )
 
 class EvalContinouslyGrad(EvalContinouslyMean):
 

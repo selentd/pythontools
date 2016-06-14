@@ -18,7 +18,7 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
         if hasResult:
             buy = transactionResult.indexBuy.close
 
-            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {:> 6.3f} {:> 6.3f} {:> 6.3f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -32,7 +32,10 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean13)-1.0,
                           (buy / transactionResult.indexBuy.mean21)-1.0,
                           (buy / transactionResult.indexBuy.mean89)-1.0,
-                          (buy / transactionResult.indexBuy.mean200)-1.0 )
+                          (buy / transactionResult.indexBuy.mean200)-1.0,
+                          transactionResult.indexBuy.grad13,
+                          transactionResult.indexBuy.grad21,
+                          transactionResult.indexBuy.grad200 )
 
         else:
             print str.format( '{:10} no result', transactionResult.indexName )
@@ -41,11 +44,12 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
 def requestContinousCallBuys( runParameters ):
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.02
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = 0.0
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = 0.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     descrStr = "run current calls"
@@ -61,6 +65,7 @@ def requestContinousPutBuys( runParameters ):
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 13
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     descrStr = "run current puts"
@@ -69,7 +74,7 @@ def requestContinousPutBuys( runParameters ):
 def requestContinousBuys():
     runParameters = dict()
 
-    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2016, 04, 01)
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2016, 01, 01)
     runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime.now()
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
