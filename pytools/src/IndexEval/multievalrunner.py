@@ -233,6 +233,107 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         while self.evalStart < self.endDate:
             idxList = self.indexSelector.select( self.evalStart, self.evalEnd )
 
+            if currentTransaction0 != None and currentTransaction0.indexSell.date < self.evalStart:
+                currentTransaction0 = None
+            if currentTransaction1 != None and currentTransaction1.indexSell.date < self.evalStart:
+                currentTransaction1 = None
+            if currentTransaction2 !=None and currentTransaction2.indexSell.date < self.evalStart:
+                currentTransaction2 = None
+
+            if (len(idxList) > 0) and (idxList[0][1] > 0):
+                transaction0 = self._getNextTransaction(idxList[0][0], self.evalStart, self.evalEnd)
+
+            if (len(idxList) > 1) and (idxList[1][1] > 0):
+                transaction1 = self._getNextTransaction(idxList[1][0], self.evalStart, self.evalEnd)
+
+            if (len(idxList) > 2) and (idxList[2][1] > 0):
+                transaction2 = self._getNextTransaction(idxList[2][0], self.evalStart, self.evalEnd)
+
+            if currentTransaction0 == None:
+                if transaction0 != None:
+                    currentTransaction0 = transaction0
+                    currentTransaction0.indexName = idxList[0][0]
+                    currentTransaction0.idxCount = len(idxList)
+                    currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                    currentTransaction0.idxSelect = idxList[0][1]
+                    self.transactionList0.addTransactionResult(currentTransaction0)
+                    transaction0 = None
+                else:
+                    if transaction1 != None:
+                        currentTransaction0 = transaction1
+                        currentTransaction0.indexName = idxList[1][0]
+                        currentTransaction0.idxCount = len(idxList)
+                        currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction0.idxSelect = idxList[1][1]
+                        self.transactionList0.addTransactionResult(currentTransaction0)
+                        transaction1 = None
+                    else:
+                        if transaction2 != None:
+                            currentTransaction0 = transaction2
+                            currentTransaction0.indexName = idxList[2][0]
+                            currentTransaction0.idxCount = len(idxList)
+                            currentTransaction0.idxPositive = self._countPositiveIndex( idxList )
+                            currentTransaction0.idxSelect = idxList[2][1]
+                            self.transactionList0.addTransactionResult(currentTransaction0)
+                            transaction2 = None
+
+            if currentTransaction1 == None:
+                if transaction0 != None:
+                    currentTransaction1 = transaction0
+                    currentTransaction1.indexName = idxList[0][0]
+                    currentTransaction1.idxCount = len(idxList)
+                    currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                    currentTransaction1.idxSelect = idxList[0][1]
+                    self.transactionList1.addTransactionResult(currentTransaction1)
+                    transaction0 = None
+                else:
+                    if transaction1 != None:
+                        currentTransaction1 = transaction1
+                        currentTransaction1.indexName = idxList[1][0]
+                        currentTransaction1.idxCount = len(idxList)
+                        currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction1.idxSelect = idxList[1][1]
+                        self.transactionList1.addTransactionResult(currentTransaction1)
+                        transaction1 = None
+                    else:
+                        if transaction2 != None:
+                            currentTransaction1 = transaction2
+                            currentTransaction1.indexName = idxList[2][0]
+                            currentTransaction1.idxCount = len(idxList)
+                            currentTransaction1.idxPositive = self._countPositiveIndex( idxList )
+                            currentTransaction1.idxSelect = idxList[2][1]
+                            self.transactionList1.addTransactionResult(currentTransaction1)
+                            transaction2 = None
+
+            if currentTransaction2 == None:
+                if transaction0 != None:
+                    currentTransaction2 = transaction0
+                    currentTransaction2.indexName = idxList[0][0]
+                    currentTransaction2.idxCount = len(idxList)
+                    currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                    currentTransaction2.idxSelect = idxList[0][1]
+                    self.transactionList2.addTransactionResult(currentTransaction2)
+                    transaction0 = None
+                else:
+                    if transaction1 != None:
+                        currentTransaction2 = transaction1
+                        currentTransaction2.indexName = idxList[1][0]
+                        currentTransaction2.idxCount = len(idxList)
+                        currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                        currentTransaction2.idxSelect = idxList[1][1]
+                        self.transactionList2.addTransactionResult(currentTransaction2)
+                        transaction1 = None
+                    else:
+                        if transaction2 != None:
+                            currentTransaction2 = transaction2
+                            currentTransaction2.indexName = idxList[2][0]
+                            currentTransaction2.idxCount = len(idxList)
+                            currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
+                            currentTransaction2.idxSelect = idxList[2][1]
+                            self.transactionList2.addTransactionResult(currentTransaction2)
+                            transaction2 = None
+
+            '''
             if (len(idxList) > 0) and (idxList[0][1] > 0):
                 if currentTransaction0 == None or currentTransaction0.indexSell.date < self.evalStart:
                     currentTransaction0 = self._getNextTransaction( idxList[0][0], self.evalStart, self.evalEnd )
@@ -262,7 +363,7 @@ class MulitEvalRunner(evalrunner.EvalRunner):
                         currentTransaction2.idxPositive = self._countPositiveIndex( idxList )
                         currentTransaction2.idxSelect = idxList[2][1]
                         self.transactionList2.addTransactionResult(currentTransaction2)
-
+            '''
             self.evalStart = self.evalEnd
             self.evalEnd = self._calculateEvalEnd(self.evalStart)
 
@@ -502,18 +603,18 @@ def runPutEvaluations():
     period = 9
 
     maxWin = 0.0
-    maxLoss = 0.0001
-    maxJump = 0.00
-    maxHighJump = 0.00
+    maxLoss = -0.01
+    maxJump = -0.04
+    maxHighJump = 0.0
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
     #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
     runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-    #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
-    runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
+    runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
 
     runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
@@ -524,6 +625,7 @@ def runPutEvaluations():
     meanKey3 = 0
 
     meanList = (5, 8, 13, 21, 34, 38, 50, 55, 89, 100, 144, 200, 233)
+    #meanList = (5, 8, 13, 21)
 
     for meanKey in meanList:
         for endMean in meanList:
@@ -598,6 +700,7 @@ def runPutEvaluations():
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
+    '''
     runPutEvaluations()
     '''
     runParameters = dict()
@@ -623,6 +726,8 @@ if __name__ == "__main__":
                   #indexdatabase.IndexDatabase.idxBrent
                 ]
 
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
+
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
     runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
@@ -632,8 +737,8 @@ if __name__ == "__main__":
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 200
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 0
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 0
     runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
     runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
 
@@ -642,21 +747,29 @@ if __name__ == "__main__":
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+    maxLoss = 0.0   # -0.01
+    maxJump = 0.0   # -0.02
 
-    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 4
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.01
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = -0.04
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
-    testEvaluation = TestEvalMonthly( runParameters )
-    testEvaluation.run( descr )
+    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+
+    testEvaluation = TestEvalContinously3( runParameters )
+    #testEvaluation = TestEvalContinouslyGrad( runParameters )
+    testEvaluation.run( descr, indexList )
+
+    descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
+    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )
     multiTestEvaluation.setTransactionListDict(testEvaluation.transactionListDict)
-    multiTestEvaluation.run()
+    multiTestEvaluation.run( descr )
 
     print ""
 
+    '''
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 
     maxLoss = 0.0   # -0.01

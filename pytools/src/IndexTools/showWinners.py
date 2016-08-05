@@ -50,13 +50,14 @@ def showTransactions( transactionListDict ):
 def showWinners():
     runParameters = dict()
 
-    meanKey = 5
+    meanKey = 21
     meanKey2 = 0
     meanKey3 = 0
+    endMeanKey = meanKey
 
     maxWin = 0.0
-    maxLoss = 0.0
-    maxJump = 0.0
+    maxLoss = 0.02
+    maxJump = 0.05
     maxHighJump = 0.0
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
@@ -64,12 +65,13 @@ def showWinners():
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
     runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
-    #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
 
-    runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = False
+    runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
     runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = meanKey2
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
+    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = endMeanKey
 
     runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
