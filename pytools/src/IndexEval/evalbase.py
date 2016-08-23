@@ -18,6 +18,8 @@ class EvalBase:
     maxJumpKey = "maxJump"
     maxHighJumpKey = "maxHighJump"
 
+    endTransactionCalcKey = "endTransactionCalc"
+
     meanKey        = "mean"
     startOffsetKey = "startOffset"
     endOffsetKey   = "endOffset"
@@ -67,7 +69,7 @@ class EvalBase:
 
     def _setupPostTransactionCheckers(self):
         self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin != 0.0 or self.maxHighJump != 0.0)
-        if self.hasPostEndTransactionChecker:
+        if self.hasPostEndTransactionChecker or self.runParameters.has_key(EvalBase.endTransactionCalcKey):
             checkerList = list()
             if self.maxDays > 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxDays(self.maxDays))
@@ -83,6 +85,9 @@ class EvalBase:
 
             if self.maxHighJump != 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxHighJump( self.maxHighJump ))
+
+            if self.runParameters.has_key(EvalBase.endTransactionCalcKey):
+                checkerList.append( self.runParameters[EvalBase.endTransactionCalcKey])
 
             self.postEndTransactionChecker = transactionchecker.EndTransactionCheckerStrategie( checkerList )
 

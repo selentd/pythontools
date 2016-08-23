@@ -42,6 +42,7 @@ class EvalContinously(evalbase.EvalBase):
         isInTransaction = False
 
         for idxData in self.indexHistory.indexHistory:
+        # --- check transaction
             if isInTransaction:
                 idxHistory.addIndexData( idxData )
 

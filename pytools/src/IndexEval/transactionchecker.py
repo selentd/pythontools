@@ -315,6 +315,7 @@ class EndTransactionCheckerGrad(EndTransactionChecker):
         self.isCall = isCall
 
     def checkEndTransaction(self, idxData, idxHistoryLen):
+        self._updateData(idxData, idxHistoryLen)
         endTransaction = False
         gradValue = idxData.getGradValue( self.grad ) - self.minGrad
         if gradValue != 0.0:
@@ -323,3 +324,40 @@ class EndTransactionCheckerGrad(EndTransactionChecker):
             else:
                 endTransaction = (gradValue > 0.0)
         return endTransaction
+
+class EndTransactionCheckerMulit(EndTransactionChecker):
+    def __init__(self, maxLoss, relLoss, maxDay, isCall=True):
+        self.maxLoss = maxLoss
+        self.relLoss = relLoss
+        self.maxDay = maxDay
+        self.isCall = isCall
+
+    def checkEndTransactionCall(self, idxData, idxHistoryLen):
+        endTransaction = False
+        if idxHistoryLen > self.maxDay:
+            # if max days are reached, allow only loss of maxLoss and check for max relative loss
+
+            # --- calculate current max win
+            # --- calculate current result
+            curRes = (idxData.close / self.idxBuy.close) - 1
+
+            maxWin = (self.maxHigh / self.idxBuy.close) - 1
+
+            # --- calculate current result
+            curRes = (idxData.close / self.idxBuy.close) - 1
+
+            if curRes < self.maxLoss:
+                endTransaction = True
+
+            if curRes < (maxWin * self.relLoss):
+                endTransaction = True
+
+        return endTransaction
+
+
+    def checkEndTransaction(self, idxData, idxHistoryLen):
+        self._updateData(idxData, idxHistoryLen)
+        if self.isCall:
+            return self.checkEndTransactionCall(idxData, idxHistoryLen)
+        else:
+            return False

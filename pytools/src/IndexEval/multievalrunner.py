@@ -6,6 +6,7 @@ Created on 27.04.2016
 
 import datetime
 
+import evalbase
 import evalcontinously
 import evalmonthly
 
@@ -15,7 +16,7 @@ import fetchdata
 import indexdata
 import indexdatabase
 import indexselector
-
+import transactionchecker
 
 class MultiEvalPrinter(evalresult.TransactionResultPrinter):
 
@@ -718,13 +719,15 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxMDax,
                   indexdatabase.IndexDatabase.idxNasdaq100,
                   indexdatabase.IndexDatabase.idxNikkei,
-                  indexdatabase.IndexDatabase.idxSDax,
+                  #indexdatabase.IndexDatabase.idxSDax,
                   indexdatabase.IndexDatabase.idxSMI,
                   indexdatabase.IndexDatabase.idxSP500,
-                  indexdatabase.IndexDatabase.idxTecDax
-                  #indexdatabase.IndexDatabase.idxGold,
-                  #indexdatabase.IndexDatabase.idxBrent
+                  indexdatabase.IndexDatabase.idxTecDax,
+                  indexdatabase.IndexDatabase.idxGold,
+                  indexdatabase.IndexDatabase.idxBrent
                 ]
+
+    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( 0.0, 0.5, 4, True)
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
 
@@ -741,16 +744,16 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 0
     runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
     runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
-
+    runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    maxLoss = 0.0   # -0.01
+    maxLoss = -0.001   # -0.01
     maxJump = 0.0   # -0.02
 
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss

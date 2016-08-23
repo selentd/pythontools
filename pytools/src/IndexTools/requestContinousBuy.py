@@ -49,7 +49,7 @@ def requestContinousCallBuys( runParameters ):
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 0
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     descrStr = "run current calls"
@@ -88,7 +88,7 @@ def requestContinousBuys():
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
 
     requestContinousCallBuys( runParameters )
-    requestContinousPutBuys( runParameters )
+    #requestContinousPutBuys( runParameters )
 
 if __name__ == '__main__':
     requestContinousBuys()

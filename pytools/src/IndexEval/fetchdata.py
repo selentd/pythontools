@@ -125,6 +125,10 @@ class FetchData():
         searchDate = datetime.datetime( year, month, day )
         startDate = searchDate
         startDate = startDate + datetime.timedelta(-1)
+        hasEntry = False
+        idxEntry = IndexData()
+
+        '''
         if self.collection.find_one({'date': {'$lt': searchDate} }) != None:
             entry = None
             while entry == None:
@@ -134,6 +138,15 @@ class FetchData():
 
             idxEntry = IndexData()
             idxEntry.setDictionary(entry)
+            return idxEntry
+        else:
+            return None
+        '''
+        for entry in self.collection.find({'date' : {'$lt': searchDate}}).sort('date', -1).limit(1):
+            idxEntry.setDictionary(entry)
+            hasEntry = True
+
+        if hasEntry:
             return idxEntry
         else:
             return None
