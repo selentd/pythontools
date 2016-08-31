@@ -57,6 +57,7 @@ def addIndizes():
                  'ftsemib',
                  'gold',
                  'hangseng',
+                 'hscei',
                  'ibex',
                  'mdax',
                  'nasdaq100',

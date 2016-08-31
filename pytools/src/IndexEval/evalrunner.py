@@ -82,6 +82,7 @@ class EvalRunner(object):
         self.idxFTS100      = "ftse100"
         self.idxFtseMib     = "ftsemib"
         self.idxHangSeng    = "hangseng"
+        self.idxHangSengCei = "hscei"
         self.idxIbex        = "ibex"
         self.idxMDax        = "mdax"
         self.idxNasdaq100   = "nasdaq100"
@@ -95,9 +96,9 @@ class EvalRunner(object):
         self.idxBrent       = "brent"
 
         self.allIndices = [self.idxATX, self.idxCAC, self.idxDax, self.idxDowJones, self.idxEStoxx50,
-                           self.idxFTS100, self.idxFtseMib, self.idxHangSeng, self.idxIbex, self.idxMDax,
-                           self.idxNasdaq100, self.idxNikkei, self.idxSDax, self.idxSMI, self.idxSP500, self.idxTecDax,
-                           self.idxGold, self.idxBrent]
+                           self.idxFTS100, self.idxFtseMib, self.idxHangSeng, self.idxHangSengCei,
+                           self.idxIbex, self.idxMDax, self.idxNasdaq100, self.idxNikkei, self.idxSDax,
+                           self.idxSMI, self.idxSP500, self.idxTecDax, self.idxGold, self.idxBrent]
 
         self.indexDB = indexdatabase.getIndexDatabase()
 

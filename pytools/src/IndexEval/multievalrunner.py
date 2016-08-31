@@ -715,6 +715,7 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxFTS100,
                   indexdatabase.IndexDatabase.idxFtseMib,
                   indexdatabase.IndexDatabase.idxHangSeng,
+                  indexdatabase.IndexDatabase.idxHangSengCei,
                   indexdatabase.IndexDatabase.idxIbex,
                   indexdatabase.IndexDatabase.idxMDax,
                   indexdatabase.IndexDatabase.idxNasdaq100,

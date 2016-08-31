@@ -111,7 +111,7 @@ class IndexSelectorRSIAvgMonth(IndexSelector):
                         result += ((idxDataStart.close / idxData.close) - 1.0) * count
                         divisor += count
                         count -= 1.0
-                        result /= divisor
+                    result /= divisor
 
                 else:
                     for idxData in idxDataList:

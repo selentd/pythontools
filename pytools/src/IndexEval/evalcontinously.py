@@ -7,12 +7,11 @@ Created on 17.03.2016
 import datetime
 
 import evalbase
+import evalrunner
 import fetchdata
 import indexdata
 
-
 import transactionchecker
-
 
 class EvalContinously(evalbase.EvalBase):
     '''
@@ -206,3 +205,21 @@ class EvalContinouslyGrad(EvalContinouslyMean):
                                                                 [transactionchecker.StartTransactionCheckerGrad(self.grad, self.minGrad, self.isCall)])
 
         self.endTransactionChecker = transactionchecker.EndTransactionCheckerGrad( self.grad, -(self.minGrad), self.isCall)
+
+class EvalContinouslyMeanRunner(evalrunner.EvalRunner):
+
+    def __init__(self, runParameters):
+        evalrunner.EvalRunner.__init__(self, runParameters)
+
+    def _createIndexEvaluation(self, indexName):
+        evaluation = EvalContinouslyMean( self.dbName, indexName, self.runParameters )
+        return evaluation
+
+class EvalContinouslyGradRunner(evalrunner.EvalRunner):
+
+    def __init__(self, runParameters):
+        evalrunner.EvalRunner.__init__(self, runParameters)
+
+    def _createIndexEvaluation(self, indexName):
+        evaluation = EvalContinouslyGrad( self.dbName, indexName, self.runParameters )
+        return evaluation

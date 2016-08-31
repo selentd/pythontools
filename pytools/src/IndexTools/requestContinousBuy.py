@@ -43,8 +43,8 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
 
 def requestContinousCallBuys( runParameters ):
 
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = 0.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = -0.001
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = 0.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
@@ -74,7 +74,7 @@ def requestContinousPutBuys( runParameters ):
 def requestContinousBuys():
     runParameters = dict()
 
-    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2016, 01, 01)
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime(2016,8,1)
     runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime.now()
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0

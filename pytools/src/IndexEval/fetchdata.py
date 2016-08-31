@@ -151,6 +151,20 @@ class FetchData():
         else:
             return None
 
+    def fetchNextHistoryValue(self, year, month, day):
+        searchDate = datetime.datetime( year, month, day )
+        hasEntry = False
+        idxEntry = IndexData()
+
+        for entry in self.collection.find( {'date' : {'$gte' : searchDate}}).sort('date', 1).limit(1):
+            idxEntry.setDictionary(entry)
+            hasEntry = True
+
+        if hasEntry:
+            return idxEntry
+        else:
+            return None
+
     def fetchLastDayOfMonth(self, year, month):
         if month == 12:
             month = 1

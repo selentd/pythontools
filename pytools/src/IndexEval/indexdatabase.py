@@ -22,6 +22,7 @@ class IndexDatabase:
     idxFTS100      = "ftse100"
     idxFtseMib     = "ftsemib"
     idxHangSeng    = "hangseng"
+    idxHangSengCei = "hscei"
     idxIbex        = "ibex"
     idxMDax        = "mdax"
     idxNasdaq100   = "nasdaq100"
@@ -35,11 +36,9 @@ class IndexDatabase:
     idxBrent       = "brent"
 
     allIndices = [idxATX, idxCAC, idxDax, idxDowJones, idxEStoxx50,
-                  idxFTS100, idxFtseMib, idxHangSeng, idxIbex, idxMDax,
-                  idxNasdaq100, idxNikkei, idxSDax, idxSMI, idxSP500, idxTecDax,
-                  idxGold, idxBrent]
-
-
+                  idxFTS100, idxFtseMib, idxHangSeng, idxHangSengCei,
+                  idxIbex, idxMDax, idxNasdaq100, idxNikkei, idxSDax,
+                  idxSMI, idxSP500, idxTecDax, idxGold, idxBrent]
 
     def __init__(self):
         '''
