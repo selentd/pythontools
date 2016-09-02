@@ -70,6 +70,7 @@ class EvalBase:
     def _setupPostTransactionCheckers(self):
         self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin != 0.0 or self.maxHighJump != 0.0)
         if self.hasPostEndTransactionChecker or self.runParameters.has_key(EvalBase.endTransactionCalcKey):
+            self.hasPostEndTransactionChecker = True
             checkerList = list()
             if self.maxDays > 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxDays(self.maxDays))

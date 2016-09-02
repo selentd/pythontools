@@ -728,7 +728,7 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxBrent
                 ]
 
-    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( 0.0, 0.5, 4, True)
+    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( -0.04, 0.0, 5, True)
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
 
@@ -740,25 +740,26 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 0
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 0
-    runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
-    runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
-    runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 55
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 100
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 233
+    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 100
+    #runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
+    #runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
+    #runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    maxLoss = -0.001   # -0.01
+    maxLoss = -0.03   # -0.01
     maxJump = 0.0   # -0.02
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
 
-    runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
+    #runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+    #runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
 
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )

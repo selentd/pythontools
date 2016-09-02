@@ -338,18 +338,23 @@ class EndTransactionCheckerMulit(EndTransactionChecker):
             # if max days are reached, allow only loss of maxLoss and check for max relative loss
 
             # --- calculate current max win
-            # --- calculate current result
-            curRes = (idxData.close / self.idxBuy.close) - 1
-
-            maxWin = (self.maxHigh / self.idxBuy.close) - 1
+            maxWin = (self.maxClose / self.idxBuy.close) - 1.0
 
             # --- calculate current result
-            curRes = (idxData.close / self.idxBuy.close) - 1
+            curRes = (idxData.close / self.idxBuy.close) - 1.0
 
-            if curRes < self.maxLoss:
-                endTransaction = True
+            # check for maxLoss together with current win
+            if maxWin > self.maxLoss*(-1.0):
+                if curRes < 0.0:
+                    endTransaction = True
+            else:
+                if curRes < self.maxLoss + maxWin:
+                    endTransaction = True        
+            
+            #if curRes < self.maxLoss:
+            #    endTransaction = True
 
-            if curRes < (maxWin * self.relLoss):
+            if maxWin > 0.0 and (curRes < (maxWin * self.relLoss)):
                 endTransaction = True
 
         return endTransaction
