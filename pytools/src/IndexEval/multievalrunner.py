@@ -243,12 +243,18 @@ class MulitEvalRunner(evalrunner.EvalRunner):
 
             if (len(idxList) > 0) and (idxList[0][1] > 0):
                 transaction0 = self._getNextTransaction(idxList[0][0], self.evalStart, self.evalEnd)
+            else:
+                transaction0 = None
 
             if (len(idxList) > 1) and (idxList[1][1] > 0):
                 transaction1 = self._getNextTransaction(idxList[1][0], self.evalStart, self.evalEnd)
+            else:
+                transaction1 = None
 
             if (len(idxList) > 2) and (idxList[2][1] > 0):
                 transaction2 = self._getNextTransaction(idxList[2][0], self.evalStart, self.evalEnd)
+            else:
+                transaction2 = None
 
             if currentTransaction0 == None:
                 if transaction0 != None:
@@ -720,7 +726,7 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxMDax,
                   indexdatabase.IndexDatabase.idxNasdaq100,
                   indexdatabase.IndexDatabase.idxNikkei,
-                  #indexdatabase.IndexDatabase.idxSDax,
+                  indexdatabase.IndexDatabase.idxSDax,
                   indexdatabase.IndexDatabase.idxSMI,
                   indexdatabase.IndexDatabase.idxSP500,
                   indexdatabase.IndexDatabase.idxTecDax,
@@ -728,31 +734,34 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxBrent
                 ]
 
-    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( -0.04, 0.0, 5, True)
+    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( 0.0, 0.5, 4, True)
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
-    runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
+    runParameters[evalrunner.EvalRunner.fixedInvestKey] = True
 
     runParameters[evalcontinously.EvalContinously.maxDaysKey] = 0
     runParameters[evalcontinously.EvalContinously.maxWinKey] = 0.0
 
+    # --- 55/100/233/e100 ---
+    # --- 21/e21
+    # --- 21/200/e21 ---
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 55
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 100
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 233
-    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 100
-    #runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.0
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 0
+    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 21
+    #runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.01
     #runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
-    #runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
+    runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
-    maxLoss = -0.03   # -0.01
+    maxLoss = -0.001   # -0.01
     maxJump = 0.0   # -0.02
 
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
@@ -765,7 +774,7 @@ if __name__ == "__main__":
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
     testEvaluation.run( descr, indexList )
 
-    descr = str.format("\"mL {:3.2f} mJ {:3.2f}\"", maxLoss, maxJump)
+    descr = str.format("\"mL {:4.3f} mJ {:4.3f}\"", maxLoss, maxJump)
     runParameters[evalrunner.EvalRunner.transactionPrinterKey] = MultiEvalPrinter()
 
     multiTestEvaluation = MulitEvalRunner( runParameters )

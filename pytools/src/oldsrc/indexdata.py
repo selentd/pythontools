@@ -102,6 +102,8 @@ class IndexData:
         self.grad144 = 0.0
         self.grad200 = 0.0
         self.grad233 = 0.0
+        
+        self.atr10 = 0.0
 
 
     def _checkData(self):
@@ -156,6 +158,9 @@ class IndexData:
         self.grad200 = mean.mean200.getDiffValue()
         self.grad233 = mean.mean233.getDiffValue()
 
+    def setATR(self, atr):
+        self.atr10 = atr.getMeanValue()
+        
     def getDictionary(self):
         return { "date": datetime.datetime(self.date.year,
                                            self.date.month,
@@ -189,7 +194,8 @@ class IndexData:
                  "grad100": self.grad100,
                  "grad144": self.grad144,
                  "grad200": self.grad200,
-                 "grad233": self.grad233 }
+                 "grad233": self.grad233,
+                 "atr10" : self.atr10 }
 
     def setDictionary(self, data):
         self.date = data["date"]
@@ -223,7 +229,59 @@ class IndexData:
         self.grad144 = data["grad144"]
         self.grad200 = data["grad200"]
         self.grad233 = data["grad233"]
+        self.atr10 = data["atr10"]
         self._checkData()
+
+class ATRCalc: 
+    def __init__(self, size = 10):
+        self.meanSize = size
+        self.valueQueue = collections.deque()
+        self.meanValue = 0.0
+        self.idxYesterday = None
+        self.idxToday = None
+
+    def _updateValue(self, value):        
+        if len(self.valueQueue) < self.meanSize:
+            self.valueQueue.append(value)
+            self.meanValue = self.meanValue + value
+        else:
+            self.meanValue = self.meanValue - self.valueQueue.popleft()
+            self.valueQueue.append(value)
+            self.meanValue = self.meanValue + value
+
+    def getMeanValue(self):
+        if len(self.valueQueue) == self.meanSize:
+            return self.meanValue / self.meanSize
+        else:
+            return 0
+        
+    def setData(self, idxData):
+        if self.idxYesterday == None:
+            self.idxYesterday = idxData
+        else:    
+            self.idxToday = idxData
+            
+        if self.idxYesterday != None and self.idxToday != None:
+            atr = self.idxToday.high - self.idxToday.low
+            if self.idxToday.high > self.idxYesterday.close:
+                atr2 = self.idxToday.high - self.idxYesterday.close
+            else:
+                atr2 = self.idxYesterday.close - self.idxToday.high
+                
+            if atr2 > atr:
+                atr = atr2
+                
+            if self.idxToday.low > self.idxYesterday.close:
+                atr3 = self.idxToday.low - self.idxYesterday.close
+            else:
+                atr3 = self.idxYesterday.close - self.idxToday.low
+                
+            if atr3 > atr:
+                atr = atr3        
+                
+            self._updateValue(atr)
+            self.idxYesterday = self.idxToday 
+        
 
 class IndexHistory:
     def __init__(self, fileName, historyLimit = 0):
@@ -251,10 +309,14 @@ class IndexHistory:
         self.indexHistory.reverse()
 
         meanSet = MeanSet()
+        atrCalc = ATRCalc()
+        
         for indexData in self.indexHistory:
             meanSet.setData(indexData.close)
+            atrCalc.setData(indexData)
             indexData.setMean( meanSet )
             indexData.setGrad( meanSet )
+            indexData.setATR( atrCalc )
 
     def addIndexData(self, data):
         self.indexHistory.append(data)
