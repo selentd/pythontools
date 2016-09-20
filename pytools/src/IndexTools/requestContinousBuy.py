@@ -48,8 +48,9 @@ def requestContinousCallBuys( runParameters ):
     runParameters[evalcontinously.EvalContinously.maxJumpKey] = 0.0
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 0
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 55
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 100
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 233
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     descrStr = "run current calls"
@@ -74,7 +75,7 @@ def requestContinousPutBuys( runParameters ):
 def requestContinousBuys():
     runParameters = dict()
 
-    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime(2016,8,1)
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime(2016,1,1)
     runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime.now()
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0

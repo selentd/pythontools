@@ -10,7 +10,7 @@ import indexdatabase
 import indexselector
 
 def checkBuy():
-    startDate = datetime.datetime( 2016, 1, 1)
+    startDate = datetime.datetime( 2016, 9, 1)
     endDate = datetime.datetime.today()
 
     selector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)

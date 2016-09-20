@@ -17,7 +17,7 @@ class EvalBase:
     maxLossKey = "maxLoss"
     maxJumpKey = "maxJump"
     maxHighJumpKey = "maxHighJump"
-    knockOut   = "knockOut"
+    knockOutKey = "knockOut"
 
     endTransactionCalcKey = "endTransactionCalc"
 
@@ -53,8 +53,8 @@ class EvalBase:
                 self.maxJump = self.runParameters[EvalBase.maxJumpKey]
             if self.runParameters.has_key(EvalBase.maxHighJumpKey):
                 self.maxHighJump = self.runParameters[EvalBase.maxHighJumpKey]
-            if self.runParameters.has_key(EvalBase.knockOut):
-                self.knockOut = self.runParameters[EvalBase.knockOut]
+            if self.runParameters.has_key(EvalBase.knockOutKey):
+                self.knockOut = self.runParameters[EvalBase.knockOutKey]
 
         self.startHistoryChecker = transactionchecker.StartTransactionChecker()
         self.endHistoryChecker = transactionchecker.EndTransactionChecker()

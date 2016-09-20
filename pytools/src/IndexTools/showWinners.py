@@ -283,26 +283,28 @@ def showTransactionStatistics( transactionPrinter ):
 
 def showWinners():
     runParameters = dict()
-    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( 0.0, 0.66, 4, True)
+    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulti( 0.0, 0.5, 4, True)
     transactionPrinter = DetailedTransactionPrinter()
 
-    meanKey = 21
-    meanKey2 = 0
-    meanKey3 = 0
-    endMeanKey = meanKey
+    meanKey = 55
+    meanKey2 = 100
+    meanKey3 = 233
+    endMeanKey = 100
 
     maxWin = 0.0
     maxLoss = -0.001
     maxJump = 0.0
     maxHighJump = 0.0
     maxDays = 200
+    knockOut = -0.01
+    leverage = 4.0
 
-    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2006, 1, 1)
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
     #runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime( yearStart + period, 1, 1)
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
     runParameters[evalrunner.EvalRunner.maxInvestKey] = 100000.0
-    runParameters[evalrunner.EvalRunner.fixedInvestKey] = True
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 10.0
+    runParameters[evalrunner.EvalRunner.fixedInvestKey] = False
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = leverage
 
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
     runParameters[evalcontinously.EvalContinouslyMean.meanKey] = meanKey
@@ -310,11 +312,12 @@ def showWinners():
     runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = meanKey3
     runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = endMeanKey
 
-    runParameters[evalcontinously.EvalContinously.maxDaysKey] = maxDays
-    runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
+    #runParameters[evalcontinously.EvalContinously.maxDaysKey] = maxDays
+    #runParameters[evalcontinously.EvalContinously.maxWinKey] = maxWin
     runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
-    runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
-    runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = maxHighJump
+    #runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+    #runParameters[evalcontinously.EvalContinously.maxHighJumpKey] = maxHighJump
+    runParameters[evalbase.EvalBase.knockOutKey] = knockOut
     runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("\"Mean {:3} {:3} {:3}\"", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
@@ -322,7 +325,7 @@ def showWinners():
                                     runParameters[evalcontinously.EvalContinouslyMean.mean3Key],)
 
     runParameters[evalrunner.EvalRunner.resultPrinterKey] = evalrunner.EvalResultPrinterSimple()
-    runParameters[evalrunner.EvalRunner.transactionPrinterKey] = transactionPrinter
+    #runParameters[evalrunner.EvalRunner.transactionPrinterKey] = transactionPrinter
 
     evalBuys = test_evalcontinously.TestEvalContinously( runParameters )
     evalBuys.run( descr )
