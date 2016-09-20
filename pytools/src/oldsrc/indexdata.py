@@ -39,6 +39,47 @@ class MeanSet:
             else:
                 return (self.valueQueue[self.meanSize-1] / self.valueQueue[0]) - 1.0
 
+    class MeanData2(MeanData):
+        def __init__(self, size1, size2):
+            self.meanSize1 = size1
+            self.meanSize2 = size2
+            self.valueQueue1 = collections.deque()
+            self.valueQueue2 = collections.deque()
+            self.meanValue1 = 0
+            self.meanValue2 = 0
+            self.meanValue = 0
+            
+            self.lambdaValue = float(self.meanSize1)/float(self.meanSize2)
+            self.alpha = (float(self.meanSize1) - 1.0) / (float(self.meanSize2) - self.lambdaValue)
+            
+        def addValue(self, value):
+            if len(self.valueQueue1) < self.meanSize1:
+                self.valueQueue1.append(value)
+                self.meanValue1 = self.meanValue1 + value
+            else:
+                self.meanValue1 = self.meanValue1 - self.valueQueue1.popleft()
+                self.valueQueue1.append(value)
+                self.meanValue1 = self.meanValue1 + value
+                
+                if len(self.valueQueue2) < self.meanSize2:
+                    self.valueQueue2.append(self.meanValue1 / self.meanSize1)
+                    self.meanValue2 = self.meanValue2 + (self.meanValue1 / self.meanSize1)
+                else:
+                    self.meanValue2 = self.meanValue2 - self.valueQueue2.popleft()
+                    self.valueQueue2.append(self.meanValue1 / self.meanSize1)
+                    self.meanValue2 = self.meanValue2 + (self.meanValue1 / self.meanSize1)
+                    
+                    self.meanValue = ((1.0 + self.alpha) * (self.meanValue1 / self.meanSize1)) - (self.alpha) * (self.meanValue2 / self.meanSize2) 
+
+        def getMeanValue(self):
+            return self.meanValue
+
+        def getDiffValue(self):
+            if len(self.valueQueue1) < self.meanSize1:
+                return 0.0
+            else:
+                return (self.valueQueue1[self.meanSize1-1] / self.valueQueue1[0]) - 1.0
+        
     def __init__(self):
         self.mean5 = self.MeanData(5)
         self.mean8 = self.MeanData(8)

@@ -23,7 +23,8 @@ def getIndexHistory( source, size = 10000000 ):
     return indexHistory
 
 def addIndex( source, dbName, indexName ):
-    client = MongoClient("192.168.81.147")
+    #client = MongoClient("192.168.81.147")
+    client = MongoClient("127.0.0.1")
     database = client[dbName]
     collection = database[indexName]
     collection.create_index([("date", pymongo.ASCENDING)],
