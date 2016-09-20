@@ -151,7 +151,7 @@ class EvalFirstDaysStopLoss(EvalFirstDays):
         self.jumpDiff = 0.04
 
     def _investOnFirstDaysWithStopLoss(self, lastHistory, idxHistory):
-        transaction = TransactionResultFirstDays()
+        transaction = indexdata.TransactionResultHistory()
 
         if (lastHistory.len() > 0) and (idxHistory.len() > self.useDays):
             idxBuy = lastHistory.getLast()

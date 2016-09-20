@@ -5,6 +5,7 @@ Created on 27.04.2016
 '''
 
 import datetime
+import json
 
 import evalbase
 import evalcontinously
@@ -26,7 +27,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
     def _printTransactionHistoryLooser(self, transactionResult):
         count = 0
         for idxData in transactionResult.indexHistory.indexHistory:
-            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f}',
                               transactionResult.indexName,
                               idxData.date,
                               idxData.date,
@@ -36,16 +37,15 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                               idxData.high,
                               count,
                               idxData.close - transactionResult.indexBuy.close,
-                              -((idxData.close / transactionResult.indexBuy.close) -1.0),
-                              (idxData.close / idxData.mean8)-1.0,
-                              (idxData.close / idxData.mean13)-1.0,
-                              (idxData.close / idxData.mean21)-1.0 )
+                              ((idxData.close / transactionResult.indexBuy.close) -1.0),
+                              ((idxData.low / transactionResult.indexBuy.close) -1.0),
+                              ((idxData.high / transactionResult.indexBuy.close) -1.0))
             count += 1
 
     def _printResultLooser(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -62,13 +62,17 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean89)-1.0,
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
-                          transactionResult.idxSelect )
-        #self._printTransactionHistoryLooser( transactionResult )
+                          transactionResult.idxSelect,
+                          (transactionResult.getLowValue() / transactionResult.indexBuy.close)-1.0,
+                          (transactionResult.getHighValue() / transactionResult.indexBuy.close)-1.0,
+                          (transactionResult.getLowClose() / transactionResult.indexBuy.close) - 1.0,
+                          (transactionResult.getHighClose() / transactionResult.indexBuy.close) - 1.0 )
+        self._printTransactionHistoryLooser( transactionResult )
 
     def _printTransactionHistoryWinner(self, transactionResult):
         count = 0
         for idxData in transactionResult.indexHistory.indexHistory:
-            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d}  {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+            print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f}',
                               transactionResult.indexName,
                               idxData.date,
                               idxData.date,
@@ -78,18 +82,16 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                               idxData.high,
                               count,
                               idxData.close - transactionResult.indexBuy.close,
-                              -((idxData.close / transactionResult.indexBuy.close) - 1.0),
-                              (idxData.close / idxData.mean8)-1.0,
-                              (idxData.close / idxData.mean13)-1.0,
-                              (idxData.close / idxData.mean21)-1.0 )
-
+                              ((idxData.close / transactionResult.indexBuy.close) -1.0),
+                              ((idxData.low / transactionResult.indexBuy.close) -1.0),
+                              ((idxData.high / transactionResult.indexBuy.close) -1.0))
             count += 1
 
 
     def _printResultWinner(self, transactionResult, result, resultEuro ):
         buy = transactionResult.indexBuy.close
 
-        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+        print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:10.2f} {:10.2f} {:10.2f} {:10.2f} {:3} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
                           transactionResult.indexName,
                           transactionResult.indexBuy.date,
                           transactionResult.indexSell.date,
@@ -106,8 +108,12 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (buy / transactionResult.indexBuy.mean89)-1.0,
                           (buy / transactionResult.indexBuy.mean200)-1.0,
                           float(transactionResult.idxPositive) / float(transactionResult.idxCount),
-                          transactionResult.idxSelect )
-        #self._printTransactionHistoryWinner(transactionResult)
+                          transactionResult.idxSelect,
+                          (transactionResult.getLowValue() / transactionResult.indexBuy.close)-1.0,
+                          (transactionResult.getHighValue() / transactionResult.indexBuy.close)-1.0,
+                          (transactionResult.getLowClose() / transactionResult.indexBuy.close) - 1.0,
+                          (transactionResult.getHighClose() / transactionResult.indexBuy.close) - 1.0 )
+        self._printTransactionHistoryWinner(transactionResult)
 
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
@@ -466,6 +472,20 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         resultEvaluation2 = self._createResultEvaluation("3rd", descriptionStr)
         self.transactionList2.evaluateResult( resultEvaluation2, self.resultTransactionPrinter )
         self.evaluationResultPrinter.printResult("3rd", descriptionStr, resultEvaluation2)
+        
+    def runEvaluationPart(self, descriptionStr, resultTransactionPrinter, startDate, endDate):
+        resultEvaluation0 = self._createResultEvaluation("best", descriptionStr)
+        self.transactionList0.evaluteResultPart( resultEvaluation0, startDate, endDate, resultTransactionPrinter )
+        self.evaluationResultPrinter.printResult("best", descriptionStr, resultEvaluation0)
+
+        resultEvaluation1 = self._createResultEvaluation("2nd", descriptionStr)
+        self.transactionList1.evaluteResultPart( resultEvaluation1, startDate, endDate, resultTransactionPrinter )
+        self.evaluationResultPrinter.printResult("2nd", descriptionStr, resultEvaluation1)
+
+        resultEvaluation2 = self._createResultEvaluation("3rd", descriptionStr)
+        self.transactionList2.evaluteResultPart( resultEvaluation2, startDate, endDate, resultTransactionPrinter )
+        self.evaluationResultPrinter.printResult("3rd", descriptionStr, resultEvaluation2)
+        
 
     def setTransactionListDict(self, transactionLists ):
         self.transactionListDict = transactionLists
@@ -734,7 +754,7 @@ if __name__ == "__main__":
                   indexdatabase.IndexDatabase.idxBrent
                 ]
 
-    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulit( 0.0, 0.5, 4, True)
+    endTransactionCalculator = transactionchecker.EndTransactionCheckerMulti( 0.0, 0.5, 4, True)
 
     runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime( 2000, 1, 1)
 
@@ -749,13 +769,13 @@ if __name__ == "__main__":
     # --- 21/e21
     # --- 21/200/e21 ---
     runParameters[evalcontinously.EvalContinouslyMean.isCallKey] = True
-    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 21
-    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 200
-    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 0
-    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 21
+    runParameters[evalcontinously.EvalContinouslyMean.meanKey] = 55
+    runParameters[evalcontinously.EvalContinouslyMean.mean2Key] = 100
+    runParameters[evalcontinously.EvalContinouslyMean.mean3Key] = 233
+    runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 100
     #runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.01
     #runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
-    runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
+    #runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
@@ -763,12 +783,14 @@ if __name__ == "__main__":
 
     maxLoss = -0.001   # -0.01
     maxJump = 0.0   # -0.02
+    knockOut = -0.0075
 
-    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 6.0
+    #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 4.0
 
     #runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
-    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    #runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
     #runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
+    #runParameters[evalbase.EvalBase.knockOut] = knockOut
 
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
@@ -783,6 +805,14 @@ if __name__ == "__main__":
 
     print ""
 
+    startYear = 2000
+    while startYear < 2017:
+        descr = str.format("\"from {:4} \"", startYear)
+        multiTestEvaluation.runEvaluationPart(descr, evalresult.TransactionResultPrinter(), datetime.datetime( startYear, 1, 1), datetime.datetime.today())
+        startYear += 1
+       
+    print ""
+    print runParameters       
     '''
     runParameters[evalrunner.EvalRunner.idxDistanceKey] = 8.0
 

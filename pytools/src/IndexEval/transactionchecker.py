@@ -325,7 +325,7 @@ class EndTransactionCheckerGrad(EndTransactionChecker):
                 endTransaction = (gradValue > 0.0)
         return endTransaction
 
-class EndTransactionCheckerMulit(EndTransactionChecker):
+class EndTransactionCheckerMulti(EndTransactionChecker):
     def __init__(self, maxLoss, relLoss, maxDay, isCall=True):
         self.maxLoss = maxLoss
         self.relLoss = relLoss

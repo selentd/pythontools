@@ -17,6 +17,7 @@ class EvalBase:
     maxLossKey = "maxLoss"
     maxJumpKey = "maxJump"
     maxHighJumpKey = "maxHighJump"
+    knockOut   = "knockOut"
 
     endTransactionCalcKey = "endTransactionCalc"
 
@@ -36,6 +37,7 @@ class EvalBase:
         self.maxLoss = 0.0
         self.maxJump = 0.0
         self.maxHighJump = 0.0
+        self.knockOut = 0.0
 
         if runParameters == None:
             self.runParameters = dict()
@@ -51,6 +53,8 @@ class EvalBase:
                 self.maxJump = self.runParameters[EvalBase.maxJumpKey]
             if self.runParameters.has_key(EvalBase.maxHighJumpKey):
                 self.maxHighJump = self.runParameters[EvalBase.maxHighJumpKey]
+            if self.runParameters.has_key(EvalBase.knockOut):
+                self.knockOut = self.runParameters[EvalBase.knockOut]
 
         self.startHistoryChecker = transactionchecker.StartTransactionChecker()
         self.endHistoryChecker = transactionchecker.EndTransactionChecker()
@@ -68,7 +72,12 @@ class EvalBase:
         pass
 
     def _setupPostTransactionCheckers(self):
-        self.hasPostEndTransactionChecker = (self.maxDays > 0 or self.maxLoss != 0.0 or self.maxJump != 0.0 or self.maxWin != 0.0 or self.maxHighJump != 0.0)
+        self.hasPostEndTransactionChecker = (self.maxDays > 0 
+                                             or self.maxLoss != 0.0 
+                                             or self.maxJump != 0.0 
+                                             or self.maxWin != 0.0 
+                                             or self.maxHighJump != 0.0
+                                             or self.knockOut != 0.0)
         if self.hasPostEndTransactionChecker or self.runParameters.has_key(EvalBase.endTransactionCalcKey):
             self.hasPostEndTransactionChecker = True
             checkerList = list()
@@ -86,6 +95,9 @@ class EvalBase:
 
             if self.maxHighJump != 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerMaxHighJump( self.maxHighJump ))
+                
+            if self.knockOut != 0:
+                checkerList.append( transactionchecker.EndTransactionCheckerKnockOut(self.knockOut))
 
             if self.runParameters.has_key(EvalBase.endTransactionCalcKey):
                 checkerList.append( self.runParameters[EvalBase.endTransactionCalcKey])
@@ -113,7 +125,7 @@ class EvalBase:
                     idxSell = idxData
                     break
 
-            transactionResult.setResultHistory( idxBuy, idxSell, transactionHistory )
+            transactionResult.setResultHistory( idxBuy, idxSell, transactionHistory, self.knockOut )
         else:
             transactionResult.setResultHistory( idxBuy, idxSell, idxHistory )
         return transactionResult

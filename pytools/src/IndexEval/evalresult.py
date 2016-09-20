@@ -103,7 +103,7 @@ class ResultCalculatorEuroPut(ResultCalculatorEuro):
         ResultCalculatorEuro.__init__(self, invest, fixInvest, maxInvest)
 
     def calcResult(self, buy, sell):
-        return ResultCalculatorEuro.calcResult(self, buy, sell) * (-1.0)
+        return ResultCalculatorEuro.calcResult(self, buy, sell, knockOut) * (-1.0)
 
 class ResultCalculatorEuroLeverage(ResultCalculatorEuro):
     def __init__(self, distance, invest, fixInvest = True, maxInvest = 0.0):
@@ -248,8 +248,19 @@ class EvalResult:
         result = 0.0
         resultEuro = 0.0
         if not (self.checkExclude.exclude(transactionResult)):
-            result = self.getWinLoss( transactionResult.indexBuy.close, transactionResult.indexSell.close )
-            resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, transactionResult.indexSell.close )
+            indexSell = transactionResult.indexSell.close
+            
+            if transactionResult.knockOut != 0.0:
+                indexKnockOut = transactionResult.indexBuy.close + (transactionResult.indexBuy.close * transactionResult.knockOut)
+                if transactionResult.knockOut < 0:
+                    if transactionResult.getLowValue() < indexKnockOut:
+                        indexSell = indexKnockOut
+                else:
+                    if transactionResult.getHighValue() > indexKnockOut:
+                        indexSell = indexKnockOut
+                
+            result = self.getWinLoss( transactionResult.indexBuy.close, indexSell)
+            resultEuro = self.getWinLossEuro(transactionResult.indexBuy.close, indexSell)
             self._updateResult( transactionResult, result, resultEuro)
             hasResult = True
 
