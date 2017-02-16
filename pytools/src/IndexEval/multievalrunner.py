@@ -67,7 +67,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (transactionResult.getHighValue() / transactionResult.indexBuy.close)-1.0,
                           (transactionResult.getLowClose() / transactionResult.indexBuy.close) - 1.0,
                           (transactionResult.getHighClose() / transactionResult.indexBuy.close) - 1.0 )
-        self._printTransactionHistoryLooser( transactionResult )
+        #self._printTransactionHistoryLooser( transactionResult )
 
     def _printTransactionHistoryWinner(self, transactionResult):
         count = 0
@@ -113,7 +113,7 @@ class MultiEvalPrinter(evalresult.TransactionResultPrinter):
                           (transactionResult.getHighValue() / transactionResult.indexBuy.close)-1.0,
                           (transactionResult.getLowClose() / transactionResult.indexBuy.close) - 1.0,
                           (transactionResult.getHighClose() / transactionResult.indexBuy.close) - 1.0 )
-        self._printTransactionHistoryWinner(transactionResult)
+        #self._printTransactionHistoryWinner(transactionResult)
 
 
     def printResult(self, transactionResult, result, resultEuro, hasResult = False ):
@@ -212,6 +212,10 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         if self.runParameters.has_key(self.indexSelectorKey):
             self.indexSelector = self.runParameters[self.indexSelectorKey]
         else:
+            #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21, 34, 89, 233], True)            
+            #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21, 34, 89, 200], True)
+            #self.indexSelector = indexselector.IndexSelectorRSIAvgGrad([21, 55, 144], True)
+            #self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6], True)
             self.indexSelector = indexselector.IndexSelectorRSIAvgMonth([1,3,6,12], True)
 
     def setUp(self):
@@ -236,6 +240,9 @@ class MulitEvalRunner(evalrunner.EvalRunner):
         currentTransaction0 = None
         currentTransaction1 = None
         currentTransaction2 = None
+        transaction0 = None
+        transaction1 = None
+        transaction2 = None
 
         while self.evalStart < self.endDate:
             idxList = self.indexSelector.select( self.evalStart, self.evalEnd )
@@ -249,19 +256,14 @@ class MulitEvalRunner(evalrunner.EvalRunner):
 
             if (len(idxList) > 0) and (idxList[0][1] > 0):
                 transaction0 = self._getNextTransaction(idxList[0][0], self.evalStart, self.evalEnd)
-            else:
-                transaction0 = None
-
+            
             if (len(idxList) > 1) and (idxList[1][1] > 0):
                 transaction1 = self._getNextTransaction(idxList[1][0], self.evalStart, self.evalEnd)
-            else:
-                transaction1 = None
-
+            '''
             if (len(idxList) > 2) and (idxList[2][1] > 0):
                 transaction2 = self._getNextTransaction(idxList[2][0], self.evalStart, self.evalEnd)
-            else:
-                transaction2 = None
-
+            '''
+                
             if currentTransaction0 == None:
                 if transaction0 != None:
                     currentTransaction0 = transaction0
@@ -775,7 +777,7 @@ if __name__ == "__main__":
     runParameters[evalcontinously.EvalContinouslyMean.endMeanKey] = 100
     #runParameters[evalcontinously.EvalContinouslyMean.startOffsetKey] = 0.01
     #runParameters[evalcontinously.EvalContinouslyMean.endOffsetKey] = 0.0
-    #runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
+    runParameters[evalbase.EvalBase.endTransactionCalcKey] = endTransactionCalculator
 
     descr = str.format("Mean {:3} {:3} {:3}", runParameters[evalcontinously.EvalContinouslyMean.meanKey],
                                               runParameters[evalcontinously.EvalContinouslyMean.mean2Key],
@@ -783,14 +785,14 @@ if __name__ == "__main__":
 
     maxLoss = -0.001   # -0.01
     maxJump = 0.0   # -0.02
-    knockOut = -0.0075
+    knockOut = -0.04
 
-    #runParameters[evalrunner.EvalRunner.idxDistanceKey] = 4.0
+    runParameters[evalrunner.EvalRunner.idxDistanceKey] = 4.0
 
     #runParameters[evalcontinously.EvalContinously.maxDaysKey] = 200
-    #runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
+    runParameters[evalcontinously.EvalContinously.maxLossKey] = maxLoss
     #runParameters[evalcontinously.EvalContinously.maxJumpKey] = maxJump
-    #runParameters[evalbase.EvalBase.knockOut] = knockOut
+    runParameters[evalbase.EvalBase.knockOutKey] = knockOut
 
     testEvaluation = TestEvalContinously3( runParameters )
     #testEvaluation = TestEvalContinouslyGrad( runParameters )
@@ -806,7 +808,7 @@ if __name__ == "__main__":
     print ""
 
     startYear = 2000
-    while startYear < 2017:
+    while startYear < 2018:
         descr = str.format("\"from {:4} \"", startYear)
         multiTestEvaluation.runEvaluationPart(descr, evalresult.TransactionResultPrinter(), datetime.datetime( startYear, 1, 1), datetime.datetime.today())
         startYear += 1

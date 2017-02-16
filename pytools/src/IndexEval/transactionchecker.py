@@ -357,8 +357,16 @@ class EndTransactionCheckerMulti(EndTransactionChecker):
             if maxWin > 0.0 and (curRes < (maxWin * self.relLoss)):
                 endTransaction = True
 
+            if maxWin > 0.4 and (curRes < 0.3):
+                endTransaction = True
+                
+            if maxWin > 0.5 and (curRes < 0.4):
+                endTransaction = True
+                
+            if maxWin > 0.6 and (curRes < 0.5):
+                endTransaction = True
+                
         return endTransaction
-
 
     def checkEndTransaction(self, idxData, idxHistoryLen):
         self._updateData(idxData, idxHistoryLen)
