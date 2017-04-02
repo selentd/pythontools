@@ -11,8 +11,8 @@ class IndexDatabase:
     classdocs
     '''
     dbName = "stockdb"
-    dbIP   = "192.168.81.147"
-    #dbIP    = "127.0.0.1"
+    #dbIP   = "192.168.81.147"
+    dbIP    = "127.0.0.1"
 
     idxATX         = "atx"
     idxCAC         = "cac"
