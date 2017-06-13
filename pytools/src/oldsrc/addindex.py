@@ -39,9 +39,10 @@ def addIndex( source, dbName, indexName ):
 
 def addIndizes():
     '''
-    addIndex('../../data/gold.csv', 'stockdb', 'gold')
-    addIndex('../../data/brent.csv', 'stockdb', 'brent')
-
+    addIndex('../../data/sp500.csv', 'stockdb', 'sp500')
+    addIndex('../../data/tecdax.csv', 'stockdb', 'tecdax')
+    
+    
     addIndex('../../data/mdax.csv', 'stockdb', 'mdax')
 
     addIndex('../../data/nasdaq100.csv', 'stockdb', 'nasdaq100')
@@ -67,11 +68,11 @@ def addIndizes():
                  'smi',
                  'sp500',
                  'tecdax']
-
+    
     for index in indexList:
         print '../../data/'+index+'.csv'
         addIndex('../../data/'+index+'.csv', 'stockdb', index)
-
+    
 if __name__ == '__main__':
     addIndizes()
 

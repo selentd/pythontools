@@ -75,7 +75,7 @@ def requestContinousPutBuys( runParameters ):
 def requestContinousBuys():
     runParameters = dict()
 
-    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime(2016,1,1)
+    runParameters[evalrunner.EvalRunner.startDateKey] = datetime.datetime(2017,1,1)
     runParameters[evalrunner.EvalRunner.endDateKey] = datetime.datetime.now()
 
     runParameters[evalrunner.EvalRunner.startInvestKey] = 1000.0
