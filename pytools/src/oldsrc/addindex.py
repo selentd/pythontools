@@ -23,8 +23,8 @@ def getIndexHistory( source, size = 10000000 ):
     return indexHistory
 
 def addIndex( source, dbName, indexName ):
-    client = MongoClient("192.168.81.147")
-    #client = MongoClient("127.0.0.1")
+    #client = MongoClient("192.168.81.147")
+    client = MongoClient("127.0.0.1")
     database = client[dbName]
     collection = database[indexName]
     collection.create_index([("date", pymongo.ASCENDING)],
@@ -38,17 +38,17 @@ def addIndex( source, dbName, indexName ):
             collection.insert(indexEntry)
 
 def addIndizes():
-    
+    '''
     addIndex('../../data/sp500.csv', 'stockdb', 'sp500')
     addIndex('../../data/tecdax.csv', 'stockdb', 'tecdax')
     
-    '''
+    
     addIndex('../../data/mdax.csv', 'stockdb', 'mdax')
 
     addIndex('../../data/nasdaq100.csv', 'stockdb', 'nasdaq100')
     addIndex('../../data/smi.csv', 'stockdb', 'smi')
     addIndex('../../data/tecdax.csv', 'stockdb', 'tecdax')
-    
+    '''
     indexList = ['atx',
                  'brent',
                  'cac',
@@ -72,7 +72,7 @@ def addIndizes():
     for index in indexList:
         print '../../data/'+index+'.csv'
         addIndex('../../data/'+index+'.csv', 'stockdb', index)
-    '''
+    
 if __name__ == '__main__':
     addIndizes()
 
