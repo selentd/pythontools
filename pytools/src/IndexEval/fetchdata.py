@@ -23,7 +23,7 @@ class FetchData():
         Constructor
         '''
         self.indexName = indexName
-        self.startDate = datetime.datetime(1900, 01, 01)
+        self.startDate = datetime.datetime(1900, 1, 1)
         self.endDate = datetime.datetime.today()
         self.selectFunc = _selectTrue
 
@@ -175,8 +175,8 @@ class FetchData():
         return self.fetchHistoryValue( year, month, 1)
 
 if __name__ == '__main__':
-    start = datetime.datetime(1998, 01, 02, 0, 0);
-    end = datetime.datetime(1998, 02, 01, 0, 0)
+    start = datetime.datetime(1998, 1, 2, 0, 0);
+    end = datetime.datetime(1998, 2, 1, 0, 0)
 
     fetchData = FetchData( 'dax',)
     fetchData.fetchDataByDate( start, end )

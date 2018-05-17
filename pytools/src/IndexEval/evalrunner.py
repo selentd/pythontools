@@ -22,7 +22,8 @@ class EvalResultPrinter:
 class EvalResultPrinterSimple:
 
     def printResultHead(self, descriptionStr ):
-        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>10} {:>10}',
+#        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>10} {:>10}',
+        '{:10} {:25} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>6} {:>10} {:>10}'.format(
                           "index",
                           "descr",
                           "tot",
@@ -36,7 +37,8 @@ class EvalResultPrinterSimple:
                           "invest-EUR" )
 
     def printResult(self, indexName, descriptionStr, resultEvaluation):
-        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}',
+#        print str.format( '{:10} {:25} {:>6} {:>6} {:>6} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}',
+        print('{:10} {:25} {:>6} {:>6} {:>6} {:>6.2f} {:>6.3f} {:>6.3f} {:>6.3f} {:>10.2f} {:>10.2f}'.format(
                           indexName,
                           descriptionStr,
                           resultEvaluation.getTotalCount(),
@@ -47,7 +49,7 @@ class EvalResultPrinterSimple:
                           resultEvaluation.maxWin,
                           resultEvaluation.getTotalResult(),
                           resultEvaluation.getTotalResultEuro(),
-                          resultEvaluation.getTotalInvestEuro() )
+                          resultEvaluation.getTotalInvestEuro() ))
 
 
 class EvalRunner(object):
@@ -109,33 +111,39 @@ class EvalRunner(object):
             self.runParameters = runParameters
 
     def _setupStartEndTime(self):
-        if self.runParameters.has_key(EvalRunner.startDateKey):
+#        if self.runParameters.has_key(EvalRunner.startDateKey):
+        if EvalRunner.startDateKey in self.runParameters:
             self.startDate = self.runParameters[EvalRunner.startDateKey]
         else:
             self.startDate = datetime.datetime( 2000, 1, 1 )
 
-        if self.runParameters.has_key(EvalRunner.endDateKey):
+#        if self.runParameters.has_key(EvalRunner.endDateKey):
+        if EvalRunner.endDateKey in self.runParameters:
             self.endDate = self.runParameters[EvalRunner.endDateKey]
         else:
             self.endDate = datetime.datetime.today()
 
     def _setupResultCalculator(self):
-        if self.runParameters.has_key(EvalRunner.startInvestKey):
+#        if self.runParameters.has_key(EvalRunner.startInvestKey):
+        if EvalRunner.startInvestKey in self.runParameters:
             self.startInvest = self.runParameters[EvalRunner.startInvestKey]
         else:
             self.startInvest = 1000.0
 
-        if self.runParameters.has_key(EvalRunner.maxInvestKey):
+#        if self.runParameters.has_key(EvalRunner.maxInvestKey):
+        if EvalRunner.maxInvestKey in self.runParameters:
             self.maxInvest = self.runParameters[EvalRunner.maxInvestKey]
         else:
             self.maxInvest = 100000.0
 
-        if self.runParameters.has_key(EvalRunner.fixedInvestKey):
+#        if self.runParameters.has_key(EvalRunner.fixedInvestKey):
+        if EvalRunner.fixedInvestKey in self.runParameters:
             self.fixedInvest = self.runParameters[EvalRunner.fixedInvestKey]
         else:
             self.fixedInvest = True
 
-        if self.runParameters.has_key(EvalRunner.isCallKey):
+#        if self.runParameters.has_key(EvalRunner.isCallKey):
+        if EvalRunner.isCallKey in self.runParameters:
             self.isCall = self.runParameters[EvalRunner.isCallKey]
         else:
             self.isCall = True
@@ -145,7 +153,8 @@ class EvalRunner(object):
         else:
             self.resultCalculator = evalresult.ResultCalculatorPut()
 
-        if self.runParameters.has_key(EvalRunner.idxDistanceKey):
+#        if self.runParameters.has_key(EvalRunner.idxDistanceKey):
+        if EvalRunner.idxDistanceKey in self.runParameters:
             if self.isCall:
                 self.resultCalculatorEuro = evalresult.ResultCalculatorEuroLeverage( self.runParameters[EvalRunner.idxDistanceKey],
                                                                                      self.startInvest,
@@ -164,19 +173,23 @@ class EvalRunner(object):
                 self.resultCalculatorEuro = evalresult.ResultCalculatorEuroPut(self.startInvest, self.fixedInvest, self.maxInvest)
 
     def _setupResultExcludeChecker(self):
-        if self.runParameters.has_key(EvalRunner.excludeCheckerKey):
+#        if self.runParameters.has_key(EvalRunner.excludeCheckerKey):
+        if EvalRunner.excludeCheckerKey in self.runParameters:
             self.excludeChecker = self.runParameters[EvalRunner.excludeCheckerKey]
         else:
             self.excludeChecker = evalresult.ExcludeTransaction()
 
     def _setupTransactionPrinter(self):
-        if self.runParameters.has_key(EvalRunner.transactionPrinterKey):
+#        if self.runParameters.has_key(EvalRunner.transactionPrinterKey):
+        if EvalRunner.transactionPrinterKey in self.runParameters:
             self.resultTransactionPrinter = self.runParameters[EvalRunner.transactionPrinterKey]
         else:
             self.resultTransactionPrinter = evalresult.TransactionResultPrinter()
 
     def _setupEvalResultPrinter(self):
-        if self.runParameters.has_key(EvalRunner.resultPrinterKey):
+#        if self.runParameters.has_key(EvalRunner.resultPrinterKey):
+        if EvalRunner.resultPrinterKey in self.runParameters:
+            
             self.evaluationResultPrinter = self.runParameters[EvalRunner.resultPrinterKey]
         else:
             self.evaluationResultPrinter = EvalResultPrinter()

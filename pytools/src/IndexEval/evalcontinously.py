@@ -92,97 +92,116 @@ class EvalContinouslyMean(EvalContinously):
     def __init__(self, dbName, idxName, runParameters = None):
         EvalContinously.__init__(self, dbName, idxName, runParameters)
 
-        if self.runParameters.has_key( EvalContinouslyMean.isCallKey):
+#        if self.runParameters.has_key( EvalContinouslyMean.isCallKey):
+        if EvalContinouslyMean.isCallKey in self.runParameters:
             self.isCall = self.runParameters[EvalContinouslyMean.isCallKey]
         else:
             self.isCall = True
 
-        if self.runParameters.has_key( EvalContinouslyMean.meanKey):
+#        if self.runParameters.has_key( EvalContinouslyMean.meanKey):
+        if EvalContinouslyMean.endMeanKey in self.runParameters:
             self.mean = self.runParameters[EvalContinouslyMean.meanKey]
         else:
             self.mean = 200
 
-        if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
+#        if self.runParameters.has_key(EvalContinouslyMean.mean2Key):
+        if EvalContinouslyMean.mean2Key in self.runParameters:
             self.mean2 = self.runParameters[EvalContinouslyMean.mean2Key]
         else:
             self.mean2 = 0
 
-        if self.runParameters.has_key(EvalContinouslyMean.mean3Key):
+#        if self.runParameters.has_key(EvalContinouslyMean.mean3Key):
+        if EvalContinouslyMean.mean3Key in self.runParameters:
             self.mean3 = self.runParameters[EvalContinouslyMean.mean3Key]
         else:
             self.mean3 = 0
 
-        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey):
+#        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey):
+        if EvalContinouslyMean.endMeanKey in self.runParameters:
             self.endMean = self.runParameters[EvalContinouslyMean.endMeanKey]
         else:
             self.endMean = self.mean
 
-        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey2):
+#        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey2):
+        if EvalContinouslyMean.endMeanKey2 in self.runParameters:
             self.endMean2 = self.runParameters[EvalContinouslyMean.endMeanKey2]
         else:
             self.endMean2 = 0
 
-        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey3):
+#        if self.runParameters.has_key(EvalContinouslyMean.endMeanKey3):
+        if EvalContinouslyMean.endMeanKey3 in self.runParameters:
             self.endMean3 = self.runParameters[EvalContinouslyMean.endMeanKey3]
         else:
             self.endMean3 = 0
 
-        if self.runParameters.has_key( EvalContinouslyMean.gradKey ):
+#        if self.runParameters.has_key( EvalContinouslyMean.gradKey ):
+        if EvalContinouslyMean.gradKey in self.runParameters:
             self.grad = self.runParameters[EvalContinouslyMean.gradKey]
         else:
             self.grad = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.minGradKey):
+#        if self.runParameters.has_key( EvalContinouslyMean.minGradKey):
+        if EvalContinouslyMean.minGradKey in self.runParameters:
             self.minGrad = self.runParameters[EvalContinouslyMean.minGradKey]
         else:
             self.minGrad = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.grad2Key ):
+#        if self.runParameters.has_key( EvalContinouslyMean.grad2Key ):
+        if EvalContinouslyMean.grad2Key in self.runParameters:
             self.grad2 = self.runParameters[EvalContinouslyMean.grad2Key]
         else:
             self.grad2 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.minGrad2Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.minGrad2Key):
+        if EvalContinouslyMean.minGrad2Key in self.runParameters:
             self.minGrad2 = self.runParameters[EvalContinouslyMean.minGrad2Key]
         else:
             self.minGrad2 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.grad3Key ):
+#        if self.runParameters.has_key( EvalContinouslyMean.grad3Key ):
+        if EvalContinouslyMean.grad3Key in self.runParameters:
             self.grad3 = self.runParameters[EvalContinouslyMean.grad3Key]
         else:
             self.grad3 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.minGrad3Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.minGrad3Key):
+        if EvalContinouslyMean.minGrad3Key in self.runParameters:
             self.minGrad3 = self.runParameters[EvalContinouslyMean.minGrad3Key]
         else:
             self.minGrad3 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.startOffsetKey):
+#        if self.runParameters.has_key( EvalContinouslyMean.startOffsetKey):
+        if EvalContinouslyMean.startOffsetKey in self.runParameters:
             self.startOffset = self.runParameters[EvalContinouslyMean.startOffsetKey]
         else:
             self.startOffset = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.endOffsetKey):
+#        if self.runParameters.has_key( EvalContinouslyMean.endOffsetKey):
+        if EvalContinouslyMean.endOffsetKey in self.runParameters:
             self.endOffset = self.runParameters[EvalContinouslyMean.endOffsetKey]
         else:
             self.endOffset = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.startOffset2Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.startOffset2Key):
+        if EvalContinouslyMean.startOffset2Key in self.runParameters:
             self.startOffset2 = self.runParameters[EvalContinouslyMean.startOffset2Key]
         else:
             self.startOffset2 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.endOffset2Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.endOffset2Key):
+        if EvalContinouslyMean.endOffset2Key in self.runParameters:
             self.endOffset = self.runParameters[EvalContinouslyMean.endOffset2Key]
         else:
             self.endOffset2 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.startOffset3Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.startOffset3Key):
+        if EvalContinouslyMean.startOffset3Key in self.runParameters:
             self.startOffset3 = self.runParameters[EvalContinouslyMean.startOffset3Key]
         else:
             self.startOffset3 = 0.0
 
-        if self.runParameters.has_key( EvalContinouslyMean.endOffset3Key):
+#        if self.runParameters.has_key( EvalContinouslyMean.endOffset3Key):
+        if EvalContinouslyMean.endOffset3Key in self.runParameters:
             self.endOffset = self.runParameters[EvalContinouslyMean.endOffset3Key]
         else:
             self.endOffset3 = 0.0

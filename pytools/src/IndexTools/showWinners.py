@@ -6,6 +6,7 @@ Created on 08.06.2016
 
 import datetime
 
+
 import evalbase
 import evalcontinously
 import evalresult
@@ -231,7 +232,8 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
 
             #if (indexBuy.close > indexSell.close) and (minClose >= 0.0):
             if showValues == True:
-                print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:3} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+#                print str.format( '{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:3} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}',
+                print('{:10} {:%Y-%m-%d} {:%Y-%m-%d} {:3} {:10.2f} {:10.2f} {:10.2f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f} {: 2.4f}'.format(
                           transactionResult.indexName,
                           indexBuy.date,
                           indexSell.date,
@@ -243,10 +245,11 @@ class DetailedTransactionPrinter(evalresult.TransactionResultPrinter):
                           (indexBuy.high / indexBuy.close) -1.0,
                           (indexBuy.low / indexBuy.close) - 1.0,
                           (transactionResult.getHighValue() / indexBuy.close) - 1.0,
-                          (transactionResult.getLowValue() / indexBuy.close) - 1.0)
+                          (transactionResult.getLowValue() / indexBuy.close) - 1.0))
 
         else:
-            print str.format( '{:10} no result', transactionResult.indexName )
+#            print str.format( '{:10} no result', transactionResult.indexName )
+            print('{:10} no result'.format(transactionResult.indexName ))
 
 
 def showTransactions( transactionListDict ):
@@ -257,7 +260,8 @@ def showTransactions( transactionListDict ):
 def showTransactionStatistics( transactionPrinter ):
     print
     for mean in ("mean5", "mean8", "mean13", "mean21", "mean34", "mean38", "mean50", "mean55", "mean89", "mean100", "mean144", "mean200", "mean233"):
-        print str.format('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}',
+#        print str.format('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}',
+        print('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}'.format(
                 mean,
                 transactionPrinter.meanStatisticsLower[mean].total(),
                 transactionPrinter.meanStatisticsLower[mean].win,
@@ -266,10 +270,11 @@ def showTransactionStatistics( transactionPrinter ):
                 transactionPrinter.meanStatisticsUpper[mean].total(),
                 transactionPrinter.meanStatisticsUpper[mean].win,
                 transactionPrinter.meanStatisticsUpper[mean].loss,
-                transactionPrinter.meanStatisticsUpper[mean].winPercentage() )
+                transactionPrinter.meanStatisticsUpper[mean].winPercentage() ))
     print
     for grad in ("grad5", "grad8", "grad13", "grad21", "grad34", "grad38", "grad50", "grad55", "grad89", "grad100", "grad144", "grad200", "grad233"):
-        print str.format('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}',
+#        print str.format('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}',
+        print('{:10} Lower: {:4} {:4} {:4} {:4.2f} Upper: {:4} {:4} {:4} {:4.2f}'.format(
                 grad,
                 transactionPrinter.gradStatisticsLower[grad].total(),
                 transactionPrinter.gradStatisticsLower[grad].win,
@@ -278,7 +283,7 @@ def showTransactionStatistics( transactionPrinter ):
                 transactionPrinter.gradStatisticsUpper[grad].total(),
                 transactionPrinter.gradStatisticsUpper[grad].win,
                 transactionPrinter.gradStatisticsUpper[grad].loss,
-                transactionPrinter.gradStatisticsUpper[grad].winPercentage() )
+                transactionPrinter.gradStatisticsUpper[grad].winPercentage() ))
 
 
 def showWinners():

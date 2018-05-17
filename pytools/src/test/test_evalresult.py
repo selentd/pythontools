@@ -63,15 +63,15 @@ class EvalResultTest(unittest.TestCase):
         self.assertAlmostEqual(calculator.getTotal(), 1100.0, 1, "Invalid total calculation")
 
         self.assertAlmostEqual(calculator.calcResult(100, 90), -110.0, 1, "Invalid result calculation")
-        self.assertAlmostEqual(calculator.getTotal(), 990.0, 1, "Invalid total calculation")
+        self.assertAlmostEqual(calculator.getTotal(), 1000.0, 1, "Invalid total calculation")
 
-        self.assertAlmostEqual(calculator.calcResult(100, 110), 99.0, 1, "Invalid result calculation")
-        self.assertAlmostEqual(calculator.getTotal(), (990.0+99.0), 1, "Invalid total calculation")
+        self.assertAlmostEqual(calculator.calcResult(100, 110), 100.0, 1, "Invalid result calculation")
+        self.assertAlmostEqual(calculator.getTotal(), (1000.0+100.0), 1, "Invalid total calculation")
         calculator.reset()
         self.assertEqual(calculator.getTotal(), 1000.0, "Invalid initial total")
 
     def testEvalResultCall(self):
-        evaluation = evalresult.EvalResultCall( "test dax", 1000.0 )
+        evaluation = evalresult.EvalResult( "test dax", 1000.0 )
         transactionResultList = indexdata.TransactionResultHistory()
         monthlyHistory = fetchdata.FetchData( self.idxDax ).fetchMonthlyHistory(self.startDate, self.endDate)
 

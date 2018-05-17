@@ -43,17 +43,23 @@ class EvalBase:
             self.runParameters = dict()
         else:
             self.runParameters = runParameters
-            if self.runParameters.has_key(EvalBase.maxDaysKey):
+#            if self.runParameters.has_key(EvalBase.maxDaysKey):
+            if EvalBase.maxDaysKey in self.runParameters:
                 self.maxDays = self.runParameters[EvalBase.maxDaysKey]
-            if self.runParameters.has_key(EvalBase.maxWinKey):
+#            if self.runParameters.has_key(EvalBase.maxWinKey):
+            if EvalBase.maxWinKey in self.runParameters: 
                 self.maxWin = self.runParameters[EvalBase.maxWinKey]
-            if self.runParameters.has_key(EvalBase.maxLossKey):
+#            if self.runParameters.has_key(EvalBase.maxLossKey):
+            if EvalBase.maxLossKey in self.runParameters:
                 self.maxLoss = self.runParameters[EvalBase.maxLossKey]
-            if self.runParameters.has_key(EvalBase.maxJumpKey):
+#            if self.runParameters.has_key(EvalBase.maxJumpKey):
+            if EvalBase.maxJumpKey in self.runParameters:
                 self.maxJump = self.runParameters[EvalBase.maxJumpKey]
-            if self.runParameters.has_key(EvalBase.maxHighJumpKey):
+#            if self.runParameters.has_key(EvalBase.maxHighJumpKey):
+            if EvalBase.maxHighJumpKey in self.runParameters:
                 self.maxHighJump = self.runParameters[EvalBase.maxHighJumpKey]
-            if self.runParameters.has_key(EvalBase.knockOutKey):
+#            if self.runParameters.has_key(EvalBase.knockOutKey):
+            if EvalBase.knockOutKey in self.runParameters:
                 self.knockOut = self.runParameters[EvalBase.knockOutKey]
 
         self.startHistoryChecker = transactionchecker.StartTransactionChecker()
@@ -99,7 +105,8 @@ class EvalBase:
             if self.knockOut != 0:
                 checkerList.append( transactionchecker.EndTransactionCheckerKnockOut(self.knockOut))
 
-            if self.runParameters.has_key(EvalBase.endTransactionCalcKey):
+#            if self.runParameters.has_key(EvalBase.endTransactionCalcKey):
+            if EvalBase.endTransactionCalcKey in self.runParameters:
                 checkerList.append( self.runParameters[EvalBase.endTransactionCalcKey])
 
             self.postEndTransactionChecker = transactionchecker.EndTransactionCheckerStrategie( checkerList )

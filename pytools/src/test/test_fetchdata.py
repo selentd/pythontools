@@ -27,8 +27,8 @@ class FetchDataTest(unittest.TestCase):
         pass
 
     def testFetchNoData(self):
-        resultList = FetchData( self.idxDax).fetchDataByDate( datetime.datetime(1950, 01, 02, 0, 0),
-                                                                          datetime.datetime(1960, 01, 02, 0, 0) )
+        resultList = FetchData( self.idxDax).fetchDataByDate( datetime.datetime(1950, 1, 2, 0, 0),
+                                                                          datetime.datetime(1960, 1, 2, 0, 0) )
         self.assertEqual( resultList.len(), 0, "Result list is not empty")
 
     def testFetchJanuary(self):
